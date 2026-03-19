@@ -7,3 +7,4 @@ Members:
 - Corry McConnell Palmer
 - Saúl Carracelas González-Albo
 - Vitalina Syzova
+- Estefanía Sagrario Ortíz Ramírez
