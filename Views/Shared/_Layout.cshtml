@@ -1,0 +1,124 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plan2Gather - @ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    
+    <!-- Prevent flash of light mode: apply dark mode class immediately if saved -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+                // Also set body class later, but we use documentElement to avoid flash
+                // We'll also apply to body in the same script, but body may not exist yet.
+                // Safer: add a class to html, then in CSS use .dark-mode body selector
+                // However we already target body.dark-mode in CSS. So we can add to body when it's available.
+                // To avoid FOUC, we'll add a small style to hide content until body is ready? 
+                // Simpler: add class to html and adjust CSS.
+                // Let's adjust CSS to target .dark-mode body as well, but also set background on html.
+                document.documentElement.style.backgroundColor = '#121212';
+            }
+        })();
+    </script>
+    <style>
+        /* Ensure html has dark background immediately if dark mode is active */
+        html.dark-mode {
+            background-color: #121212;
+        }
+        html.dark-mode body {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Full-width blue header -->
+    <div class="blue-header">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center py-2">
+                <div class="site-title">
+                    <a href="/" class="text-white text-decoration-none fs-3 fw-bold">Plan2Gather</a>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="theme-toggle me-2">
+                        <button id="darkModeToggle" class="btn btn-outline-light btn-sm">
+                            <i id="themeIcon" class="bi bi-moon-fill"></i>
+                        </button>
+                    </div>
+                    <div class="auth-buttons">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <span class="text-white me-3">Hello, @User.Identity.Name!</span>
+                            <a asp-area="Identity" asp-page="/Account/Logout" class="btn btn-warning btn-sm">Logout</a>
+                        }
+                        else
+                        {
+                            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-warning btn-sm me-2">Register</a>
+                            <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-warning btn-sm">Login</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        (function() {
+            const toggleBtn = document.getElementById('darkModeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const htmlElement = document.documentElement;
+            
+            // Apply dark mode class to html and body based on localStorage
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    htmlElement.classList.add('dark-mode');
+                    document.body.classList.add('dark-mode');
+                    themeIcon.classList.remove('bi-moon-fill');
+                    themeIcon.classList.add('bi-sun-fill');
+                } else {
+                    htmlElement.classList.remove('dark-mode');
+                    document.body.classList.remove('dark-mode');
+                    themeIcon.classList.remove('bi-sun-fill');
+                    themeIcon.classList.add('bi-moon-fill');
+                }
+            }
+            
+            const currentTheme = localStorage.getItem('theme');
+            if (currentTheme === 'dark') {
+                applyTheme('dark');
+            } else if (currentTheme === 'light') {
+                applyTheme('light');
+            } else {
+                // default light
+                applyTheme('light');
+            }
+            
+            toggleBtn.addEventListener('click', () => {
+                const isDark = document.body.classList.contains('dark-mode');
+                if (isDark) {
+                    localStorage.setItem('theme', 'light');
+                    applyTheme('light');
+                } else {
+                    localStorage.setItem('theme', 'dark');
+                    applyTheme('dark');
+                }
+            });
+        })();
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

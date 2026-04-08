@@ -1,0 +1,81 @@
+/* Full-width blue header */
+.blue-header {
+    background-color: #1b6ec2;
+    width: 100%;
+    margin: 0;
+    padding: 0.5rem 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Yellow rectangle buttons (Register/Login) */
+.auth-buttons .btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+    font-weight: 500;
+    padding: 0.25rem 1rem;
+    border-radius: 0.2rem;
+}
+
+.auth-buttons .btn-warning:hover {
+    background-color: #e0a800;
+    border-color: #d39e00;
+}
+
+/* Orange button on home page */
+.btn-orange {
+    background-color: #fd7e14;
+    border-color: #fd7e14;
+    color: white;
+    font-weight: bold;
+    padding: 0.75rem 2rem;
+    border-radius: 0.3rem;
+}
+
+.btn-orange:hover {
+    background-color: #e96b0b;
+    border-color: #dc650a;
+    color: white;
+}
+
+/* Hide default navbar if any (in case layout had one) */
+.navbar {
+    display: none;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body.dark-mode .blue-header {
+    background-color: #0a2b4e;
+}
+
+body.dark-mode .btn-orange {
+    background-color: #e06c00;
+    border-color: #e06c00;
+}
+
+body.dark-mode .btn-warning {
+    background-color: #f0b400;
+    border-color: #d39e00;
+    color: #000;
+}
+
+body.dark-mode .card,
+body.dark-mode .table,
+body.dark-mode .border {
+    background-color: #1e1e1e;
+    border-color: #333;
+}
+
+body.dark-mode a:not(.btn) {
+    color: #8bb9fe;
+}
+
+body.dark-mode .footer {
+    background-color: #1e1e1e;
+    border-top-color: #333;
+}
