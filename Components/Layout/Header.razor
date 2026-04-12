@@ -1,0 +1,20 @@
+@* @using Microsoft.AspNetCore.Identity *@
+@* @inject SignInManager<IdentityUser> SignInManager *@
+@* @inject UserManager<IdentityUser> UserManager *@
+<header class="header">
+    <a href="/" class="logo"><span class="logo-text">Plan2<span>Gather</span></span></a>
+    <nav class="header-nav">
+        @if (IsSignedIn){
+            <a href="/account">Hello, @Name</a>
+            <a href="/logout">Log out</a>
+        }else{
+            <a href="/login" class="btn btn-primary">Log in</a>
+            <a href="/register" class="btn btn-primary">Create Account</a>
+        }
+    </nav>
+</header>
+
+@code {
+    private Boolean IsSignedIn = false;
+    private string Name = "User";
+}

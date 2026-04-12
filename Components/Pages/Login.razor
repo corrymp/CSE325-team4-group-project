@@ -1,0 +1,43 @@
+@page "/login"
+
+<PageTitle>Login</PageTitle>
+
+<h1>Login</h1>
+
+<section>
+    <form method="post">
+        <h2>Use your username and password to log in.</h2>
+        <hr>
+        <div class="text-danger" role="alert"></div>
+        
+        <fieldset><input 
+            type="text" 
+            id="username"
+            name="username" 
+            placeholder="username" 
+            required
+        >
+        <label for="username">Username</label></fieldset>
+
+        <fieldset><input 
+            type="password" 
+            id="password" 
+            name="password" 
+            required
+        >
+        <label for="password">Password</label></fieldset>
+
+        <fieldset><label for="remember">
+            <input
+                type="checkbox" 
+                id="remember"
+                name="remember" 
+            >
+            Remember me
+        </label></fieldset>
+
+        <button type="submit">Log in</button>
+
+        <fieldset><p>Don't have an account? <a href="/register">Register</a></p></fieldset>
+    </form>
+</section>

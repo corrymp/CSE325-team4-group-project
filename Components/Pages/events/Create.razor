@@ -1,0 +1,67 @@
+@page "/events/create"
+@using Microsoft.EntityFrameworkCore
+@using Plan2Gather.Models
+@inject IDbContextFactory<Plan2Gather.Data.Plan2GatherContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Event</h2>
+
+<hr>
+
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="evnt" OnValidSubmit="AddEvent" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+            <div class="mb-3">
+                <label for="name" class="form-label">Event name:</label>
+                <InputText id="name" @bind-Value="evnt.EventName" class="form-control" />
+                <ValidationMessage For="() => evnt.EventName" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="organizer" class="form-label">Organizer ID:</label>
+                <InputNumber id="organizer" @bind-Value="evnt.OrganizerId" class="form-control" />
+                <ValidationMessage For="() => evnt.OrganizerId" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Event description:</label>
+                <InputText id="description" @bind-Value="evnt.EventDescription" class="form-control" />
+                <ValidationMessage For="() => evnt.EventDescription" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="start" class="form-label">Start Time:</label>
+                <InputDate id="start" @bind-Value="evnt.StartTime" class="form-control" />
+                <ValidationMessage For="() => evnt.StartTime" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="duration" class="form-label">Duration (in hours from start time):</label>
+                <InputNumber id="duration" @bind-Value="evnt.Duration" class="form-control" />
+                <ValidationMessage For="() => evnt.Duration" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="guests" class="form-label">Allow guest accounts:</label>
+                <InputCheckbox id="guests" @bind-Value="evnt.AllowGuests" class="form-control" />
+                <ValidationMessage For="() => evnt.AllowGuests" class="text-danger" />
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div><a href="/events">Back to List</a></div>
+
+@code {
+    [SupplyParameterFromForm] private Event evnt { get; set; } = default!;
+    protected override void OnInitialized() {}
+    private async Task AddEvent()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Events.Add(evnt);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/events");
+    }
+}

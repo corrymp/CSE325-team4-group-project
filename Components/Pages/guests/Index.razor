@@ -1,0 +1,39 @@
+@page "/guests"
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Plan2Gather.Components
+@using Plan2Gather.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<Plan2GatherContext> DbFactory
+
+<PageTitle>Guests</PageTitle>
+
+<h1>Guests</h1>
+
+<div><input type="search" @bind="filter" @bind:event="oninput"></div>
+
+<p><a href="guests/create">Make new</a></p>
+
+<div>
+    <QuickGrid Class="table" Items="FilteredUsers" Pagination="pagination">
+        <PropertyColumn Property="guest => guest.GuestName" Sortable="true" Title="Name" />
+        <PropertyColumn Property="guest => guest.EventId" Sortable="true" Title="Event ID" />
+        <TemplateColumn Context="guest">
+            <a href="@($"guests/edit?id={guest.EventId}&name={guest.GuestName}")">Edit</a>
+            <a href="@($"guests/details?id={guest.EventId}&name={guest.GuestName}")">Details</a>
+            <a href="@($"guests/delete?id={guest.EventId}&name={guest.GuestName}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+</div>
+
+<Paginator State="pagination" />
+
+@code {
+    private Plan2GatherContext context = default!;
+    private PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    private string filter = string.Empty;
+    private IQueryable<Plan2Gather.Models.Guest> FilteredUsers => context.Guests.Where(g => g.GuestName.Contains(filter));
+    protected override void OnInitialized() => context = DbFactory.CreateDbContext();
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,0 +1,60 @@
+@page "/events/details"
+@using Microsoft.EntityFrameworkCore
+@using Plan2Gather.Models
+@using Plan2Gather.Data
+@inject IDbContextFactory<Plan2Gather.Data.Plan2GatherContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Event Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Event</h2>
+    <hr>
+    @if (evnt is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">ID</dt>
+            <dd class="col-sm-10">@evnt.EventId</dd>
+
+            <dt class="col-sm-2">Event name</dt>
+            <dd class="col-sm-10">@evnt.EventName</dd>
+            
+            <dt class="col-sm-2">Organizer ID</dt>
+            <dd class="col-sm-10">@evnt.OrganizerId</dd>
+
+            <dt class="col-sm-2">Start time</dt>
+            <dd class="col-sm-10">@evnt.StartTime</dd>
+            
+            <dt class="col-sm-2">Range</dt>
+            <dd class="col-sm-10">@evnt.Duration</dd>
+
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@evnt.EventDescription</dd>
+
+            <dt class="col-sm-2">Allows Guests?</dt>
+            <dd class="col-sm-10">@(evnt.AllowGuests ? "Yes" : "No")</dd>
+        </dl>
+        <div>
+            <a href="@($"/events/edit?id={evnt.EventId}")">Edit</a> |
+            <a href="@($"/events")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Event? evnt;
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        evnt = await context.Events.AsNoTracking().FirstOrDefaultAsync(e => e.EventId == Id);
+        if (evnt is null) NavigationManager.NotFound();
+    }
+}

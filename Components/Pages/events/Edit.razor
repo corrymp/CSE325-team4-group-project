@@ -1,0 +1,95 @@
+@page "/events/edit"
+@using Microsoft.EntityFrameworkCore
+@using Plan2Gather.Models
+@inject IDbContextFactory<Plan2Gather.Data.Plan2GatherContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit Event</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Event</h2>
+
+<hr>
+
+@if (Event is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Event" OnValidSubmit="UpdateEvent" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert" />
+                <input type="hidden" name="Event.EventId" value="@Event.EventId" />
+    
+                <div class="mb-3">
+                    <p>ID: <em>@Event.EventId</em></p>
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Event name:</label>
+                    <InputText id="name" @bind-Value="Event.EventName" class="form-control" />
+                    <ValidationMessage For="() => Event.EventName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="organizer" class="form-label">Organizer ID:</label>
+                    <InputNumber id="organizer" @bind-Value="Event.OrganizerId" class="form-control" />
+                    <ValidationMessage For="() => Event.OrganizerId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="start" class="form-label">Start time:</label>
+                    <InputDate id="start" @bind-Value="Event.StartTime" class="form-control" />
+                    <ValidationMessage For="() => Event.StartTime" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="Event.EventDescription" class="form-control" />
+                    <ValidationMessage For="() => Event.EventDescription" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="duration" class="form-label">Duration (in hours from start time):</label>
+                    <InputNumber id="duration" @bind-Value="Event.Duration" class="form-control" />
+                    <ValidationMessage For="() => Event.Duration" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="guests" class="form-label">Allow guests accounts:</label>
+                    <InputCheckbox id="guests" @bind-Value="Event.AllowGuests" />
+                    <ValidationMessage For="() => Event.AllowGuests" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div><a href="/events">Back to List</a></div>
+
+@code {
+    [SupplyParameterFromQuery] private int Id { get; set; }
+    [SupplyParameterFromForm] private Event? Event { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Event ??= await context.Events.FirstOrDefaultAsync(e => e.EventId == Id);
+        if (Event is null) NavigationManager.NotFound();
+    }
+    private async Task UpdateEvent()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Event!).State = EntityState.Modified;
+        try { await context.SaveChangesAsync(); }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!UserExists(Event!.EventId)) NavigationManager.NotFound();
+            else throw;
+        }
+        NavigationManager.NavigateTo("/events");
+    }
+    private bool UserExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Events.Any(e => e.EventId == id);
+    }
+}

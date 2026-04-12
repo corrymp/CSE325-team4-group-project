@@ -1,0 +1,186 @@
+using Microsoft.EntityFrameworkCore;
+using Plan2Gather.Models;
+namespace Plan2Gather.Data;
+
+public static class SeedData
+{
+    public static void Initialize(IServiceProvider serviceProvider)
+    {
+        using var context = new Plan2GatherContext(serviceProvider.GetRequiredService<DbContextOptions<Plan2GatherContext>>()) ?? throw new NullReferenceException("Context is missing");
+        AddUsers(context);
+        AddEvents(context);
+        AddGuests(context);
+        AddAvailabilities(context);
+    }
+    private static void AddUsers(Plan2GatherContext context)
+    {
+        if (context.Users == null) throw new NullReferenceException("User table is missing");
+        if (context.Users.Any()) return;
+        context.Users.AddRange(
+            new User { UserId = 42, UserName = "Omer", UserType = User.UserTypes.FULL, Email = "o.knight@email.com", PasswordHash = "I3RvZG8wLjIwNjkwNDUxMzI4NTYwMDY3" },
+            new User { UserId = 43, UserName = "Isaiah", UserType = User.UserTypes.BASIC },
+            new User { UserId = 44, UserName = "Deborah", UserType = User.UserTypes.FULL, Email = "d.martinez@email.com", PasswordHash = "I3RvZG8wLjAyNjU5MjIxNjA3Njk2ODgyMg==" },
+            new User { UserId = 45, UserName = "Abigail", UserType = User.UserTypes.FULL, Email = "a.martinez@email.com", PasswordHash = "I3RvZG8wLjk1NzY0MTkxODcyMDg0MTU=" },
+            new User { UserId = 46, UserName = "Zacharias", UserType = User.UserTypes.BASIC },
+            new User { UserId = 47, UserName = "Omer", UserType = User.UserTypes.BASIC },
+            new User { UserId = 48, UserName = "Adam", UserType = User.UserTypes.FULL, Email = "a.harris@email.com", PasswordHash = "I3RvZG8wLjc0MDk2Njc2MzEzMDg2NzE=" },
+            new User { UserId = 49, UserName = "Abigail", UserType = User.UserTypes.FULL, Email = "a.quincey@email.com", PasswordHash = "I3RvZG8wLjQzNTE5MTk1OTYzNDg3NTY3" },
+            new User { UserId = 50, UserName = "Elisabeth", UserType = User.UserTypes.FULL, Email = "e.oaks@email.com", PasswordHash = "I3RvZG8wLjI2MzQzODQ5NDg3MTY0Nzc=" },
+            new User { UserId = 51, UserName = "Flora", UserType = User.UserTypes.FULL, Email = "f.gomez@email.com", PasswordHash = "I3RvZG8wLjYyODMzMzUxMDc3MDM2NDU=" },
+            new User { UserId = 52, UserName = "Peter", UserType = User.UserTypes.BASIC },
+            new User { UserId = 53, UserName = "Tabitha", UserType = User.UserTypes.FULL, Email = "t.vargas@email.com", PasswordHash = "I3RvZG8wLjY5OTE4NTM4Mjk1ODQzMDc=" },
+            new User { UserId = 54, UserName = "Tabitha", UserType = User.UserTypes.FULL, Email = "t.davis@email.com", PasswordHash = "I3RvZG8wLjc5NzEwOTU3MjYzMzg5Nw==" },
+            new User { UserId = 55, UserName = "Isaiah", UserType = User.UserTypes.FULL, Email = "i.harris@email.com", PasswordHash = "I3RvZG8wLjQwNTkwNTgxNDU4NDE3MTk2" },
+            new User { UserId = 56, UserName = "Zacharias", UserType = User.UserTypes.BASIC },
+            new User { UserId = 57, UserName = "Miriam", UserType = User.UserTypes.BASIC }
+        );
+        context.SaveChanges();
+    }
+    private static void AddEvents(Plan2GatherContext context)
+    {
+        if (context.Events == null) throw new NullReferenceException("Event table is missing");
+        if (context.Events.Any()) return;
+        context.Events.AddRange(
+            new Event { EventId = 42, OrganizerId = 53, EventName = "Rehersal with Jacob Baker", StartTime = DateTime.Parse("2025-03-14T00:54:59.033Z"), Duration = 65, AllowGuests = false, EventDescription = "Earum consectetur eum, doloribus veniam, fugiat eius, assumenda cupiditate autem corrupti odio voluptas. Impedit alias autem temporibus, nulla recusandae rerum maxime. Fugiat quasi rem nam enim, aperiam hic veniam! Nemo." },
+            new Event { EventId = 43, OrganizerId = 45, EventName = "Rally for Town Hall", StartTime = DateTime.Parse("2025-04-10T22:51:15.106Z"), Duration = 27, AllowGuests = true, EventDescription = "Fugiat magni facere perspiciatis nisi dolorem repellendus aliquam aut nostrum assumenda natus autem voluptas officiis, quis praesentium laboriosam reiciendis ut. Numquam ea blanditiis fugit assumenda. Tempore eum ducimus quia aspernatur!" },
+            new Event { EventId = 44, OrganizerId = 54, EventName = "Meetup for Town Hall", StartTime = DateTime.Parse("2026-01-22T06:54:33.025Z"), Duration = 93, AllowGuests = false, EventDescription = "Id, neque incidunt nisi quam nobis voluptas obcaecati blanditiis laudantium nemo ad sapiente enim numquam labore quidem quibusdam possimus sint eveniet sunt! Blanditiis commodi veritatis iste eveniet voluptatibus ratione aspernatur?" },
+            new Event { EventId = 45, OrganizerId = 50, EventName = "Housewarming of Halloween", StartTime = DateTime.Parse("2025-09-06T12:36:10.947Z"), Duration = 83, AllowGuests = false, EventDescription = "Eum tenetur aliquam eius illo sequi labore praesentium voluptatibus numquam obcaecati similique, sapiente assumenda quia neque minus asperiores impedit in laudantium cumque optio ea doloribus. Reiciendis, eveniet rerum? Voluptates, consectetur!" },
+            new Event { EventId = 46, OrganizerId = 49, EventName = "Caleb Quincey - Dialogue", StartTime = DateTime.Parse("2025-01-09T07:54:52.656Z"), Duration = 84, AllowGuests = false, EventDescription = "Id, neque incidunt nisi quam nobis voluptas obcaecati blanditiis laudantium nemo ad sapiente enim numquam labore quidem quibusdam possimus sint eveniet sunt! Blanditiis commodi veritatis iste eveniet voluptatibus ratione aspernatur?" },
+            new Event { EventId = 47, OrganizerId = 48, EventName = "Gang for Vital", StartTime = DateTime.Parse("2025-02-15T16:56:44.778Z"), Duration = 54, AllowGuests = true, EventDescription = "Eum tenetur aliquam eius illo sequi labore praesentium voluptatibus numquam obcaecati similique, sapiente assumenda quia neque minus asperiores impedit in laudantium cumque optio ea doloribus. Reiciendis, eveniet rerum? Voluptates, consectetur!" },
+            new Event { EventId = 48, OrganizerId = 44, EventName = "Getting together of Hearts", StartTime = DateTime.Parse("2025-08-14T22:01:57.585Z"), Duration = 38, AllowGuests = true, EventDescription = "Harum ipsum quo mollitia qui commodi dignissimos, aliquam reiciendis et cumque sed quisquam ducimus nisi sunt consequuntur officiis sequi optio vero quod deserunt veniam impedit? Laborum odit vero distinctio nostrum." },
+            new Event { EventId = 49, OrganizerId = 45, EventName = "Rehersal with Reuben Edwards", StartTime = DateTime.Parse("2024-12-30T13:15:08.049Z"), Duration = 40, AllowGuests = false, EventDescription = "Tempora amet modi maiores inventore illum nesciunt sed, rerum aliquam reiciendis fuga nisi officiis enim asperiores ratione eveniet, quasi nobis cum. Doloremque labore vitae adipisci asperiores autem, voluptatum reiciendis assumenda!" },
+            new Event { EventId = 50, OrganizerId = 50, EventName = "Think-tank for Lehi Taylor", StartTime = DateTime.Parse("2024-11-03T17:11:33.997Z"), Duration = 52, AllowGuests = false, EventDescription = "Harum ipsum quo mollitia qui commodi dignissimos, aliquam reiciendis et cumque sed quisquam ducimus nisi sunt consequuntur officiis sequi optio vero quod deserunt veniam impedit? Laborum odit vero distinctio nostrum." },
+            new Event { EventId = 51, OrganizerId = 45, EventName = "Panel of Daniel Taylor", StartTime = DateTime.Parse("2025-05-31T00:18:17.468Z"), Duration = 27, AllowGuests = false, EventDescription = "Sed sint eaque odio laboriosam eos! Reprehenderit error nemo voluptas exercitationem ipsum natus quaerat nihil similique voluptatem minima consequuntur beatae voluptate tempore alias voluptates quod possimus necessitatibus, perferendis veniam sit?" },
+            new Event { EventId = 52, OrganizerId = 48, EventName = "Audience for Hearts", StartTime = DateTime.Parse("2025-03-30T01:06:01.606Z"), Duration = 20, AllowGuests = true, EventDescription = "Tempora amet modi maiores inventore illum nesciunt sed, rerum aliquam reiciendis fuga nisi officiis enim asperiores ratione eveniet, quasi nobis cum. Doloremque labore vitae adipisci asperiores autem, voluptatum reiciendis assumenda!" },
+            new Event { EventId = 53, OrganizerId = 49, EventName = "Peace Dawn Regathering", StartTime = DateTime.Parse("2025-01-09T12:59:19.584Z"), Duration = 99, AllowGuests = true, EventDescription = "Soluta quos necessitatibus temporibus itaque dolore! Doloremque tempora voluptate maxime sed nam recusandae, neque mollitia distinctio rerum asperiores ea inventore consequatur earum voluptatibus dolores repellendus, ex soluta expedita eligendi tempore." },
+            new Event { EventId = 54, OrganizerId = 53, EventName = "Benjamin Martinez Dinner on Cats", StartTime = DateTime.Parse("2025-05-25T23:29:05.177Z"), Duration = 68, AllowGuests = false, EventDescription = "Id, neque incidunt nisi quam nobis voluptas obcaecati blanditiis laudantium nemo ad sapiente enim numquam labore quidem quibusdam possimus sint eveniet sunt! Blanditiis commodi veritatis iste eveniet voluptatibus ratione aspernatur?" },
+            new Event { EventId = 55, OrganizerId = 49, EventName = "Conversation of Hearts", StartTime = DateTime.Parse("2024-10-28T20:31:54.406Z"), Duration = 60, AllowGuests = true, EventDescription = "Fugiat magni facere perspiciatis nisi dolorem repellendus aliquam aut nostrum assumenda natus autem voluptas officiis, quis praesentium laboriosam reiciendis ut. Numquam ea blanditiis fugit assumenda. Tempore eum ducimus quia aspernatur!" },
+            new Event { EventId = 56, OrganizerId = 49, EventName = "Band Together with Chloe and Samuel Harris", StartTime = DateTime.Parse("2025-02-14T09:50:27.009Z"), Duration = 91, AllowGuests = false, EventDescription = "Fugiat magni facere perspiciatis nisi dolorem repellendus aliquam aut nostrum assumenda natus autem voluptas officiis, quis praesentium laboriosam reiciendis ut. Numquam ea blanditiis fugit assumenda. Tempore eum ducimus quia aspernatur!" },
+            new Event { EventId = 57, OrganizerId = 50, EventName = "Ephraim Uchtdorf Lesson on Hearts", StartTime = DateTime.Parse("2026-03-28T23:46:44.975Z"), Duration = 21, AllowGuests = true, EventDescription = "Fugiat magni facere perspiciatis nisi dolorem repellendus aliquam aut nostrum assumenda natus autem voluptas officiis, quis praesentium laboriosam reiciendis ut. Numquam ea blanditiis fugit assumenda. Tempore eum ducimus quia aspernatur!" },
+            new Event { EventId = 58, OrganizerId = 51, EventName = "Thing of Halloween", StartTime = DateTime.Parse("2026-01-01T11:48:04.284Z"), Duration = 62, AllowGuests = true, EventDescription = "Deleniti, eligendi perferendis in dolorum laudantium quisquam eum quod inventore soluta. Totam eveniet veniam corrupti fuga nostrum, ipsam rem molestiae facilis! Dicta, mollitia tenetur voluptatum quisquam ipsam velit natus doloribus?" },
+            new Event { EventId = 59, OrganizerId = 53, EventName = "Vintage Housewarming", StartTime = DateTime.Parse("2026-02-10T02:15:52.493Z"), Duration = 49, AllowGuests = false, EventDescription = "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Et nihil error quas, vel consectetur libero. Sunt, vero, alias reiciendis fugit corporis sint ullam quisquam expedita cumque repellendus doloribus iure repellat." },
+            new Event { EventId = 60, OrganizerId = 48, EventName = "Council at Concordia, Connecticut", StartTime = DateTime.Parse("2025-12-05T23:10:57.471Z"), Duration = 20, AllowGuests = false, EventDescription = "Fugiat magni facere perspiciatis nisi dolorem repellendus aliquam aut nostrum assumenda natus autem voluptas officiis, quis praesentium laboriosam reiciendis ut. Numquam ea blanditiis fugit assumenda. Tempore eum ducimus quia aspernatur!" },
+            new Event { EventId = 61, OrganizerId = 45, EventName = "Congregation for Dogs", StartTime = DateTime.Parse("2025-07-09T11:52:02.901Z"), Duration = 27, AllowGuests = false, EventDescription = "Fugiat magni facere perspiciatis nisi dolorem repellendus aliquam aut nostrum assumenda natus autem voluptas officiis, quis praesentium laboriosam reiciendis ut. Numquam ea blanditiis fugit assumenda. Tempore eum ducimus quia aspernatur!" },
+            new Event { EventId = 62, OrganizerId = 45, EventName = "Phoebe Rasband Roundtable on Birthday", StartTime = DateTime.Parse("2025-01-26T02:16:23.231Z"), Duration = 41, AllowGuests = false, EventDescription = "Soluta quos necessitatibus temporibus itaque dolore! Doloremque tempora voluptate maxime sed nam recusandae, neque mollitia distinctio rerum asperiores ea inventore consequatur earum voluptatibus dolores repellendus, ex soluta expedita eligendi tempore." },
+            new Event { EventId = 63, OrganizerId = 44, EventName = "Audience for Gaming", StartTime = DateTime.Parse("2026-01-28T11:07:38.917Z"), Duration = 71, AllowGuests = true, EventDescription = "Deleniti, eligendi perferendis in dolorum laudantium quisquam eum quod inventore soluta. Totam eveniet veniam corrupti fuga nostrum, ipsam rem molestiae facilis! Dicta, mollitia tenetur voluptatum quisquam ipsam velit natus doloribus?" },
+            new Event { EventId = 64, OrganizerId = 53, EventName = "Conversation at Town Hall", StartTime = DateTime.Parse("2025-04-14T01:48:52.947Z"), Duration = 69, AllowGuests = false, EventDescription = "Tempora amet modi maiores inventore illum nesciunt sed, rerum aliquam reiciendis fuga nisi officiis enim asperiores ratione eveniet, quasi nobis cum. Doloremque labore vitae adipisci asperiores autem, voluptatum reiciendis assumenda!" },
+            new Event { EventId = 65, OrganizerId = 44, EventName = "Frank Larkin Convening on Candles", StartTime = DateTime.Parse("2025-09-03T00:05:56.648Z"), Duration = 47, AllowGuests = true, EventDescription = "Tempora amet modi maiores inventore illum nesciunt sed, rerum aliquam reiciendis fuga nisi officiis enim asperiores ratione eveniet, quasi nobis cum. Doloremque labore vitae adipisci asperiores autem, voluptatum reiciendis assumenda!" },
+            new Event { EventId = 66, OrganizerId = 53, EventName = "Forum of Riverbend, IL Library", StartTime = DateTime.Parse("2025-05-19T20:50:26.981Z"), Duration = 48, AllowGuests = false, EventDescription = "Eum tenetur aliquam eius illo sequi labore praesentium voluptatibus numquam obcaecati similique, sapiente assumenda quia neque minus asperiores impedit in laudantium cumque optio ea doloribus. Reiciendis, eveniet rerum? Voluptates, consectetur!" },
+            new Event { EventId = 67, OrganizerId = 51, EventName = "Band Together at Town Hall", StartTime = DateTime.Parse("2024-10-28T03:01:14.149Z"), Duration = 70, AllowGuests = true, EventDescription = "Id, neque incidunt nisi quam nobis voluptas obcaecati blanditiis laudantium nemo ad sapiente enim numquam labore quidem quibusdam possimus sint eveniet sunt! Blanditiis commodi veritatis iste eveniet voluptatibus ratione aspernatur?" },
+            new Event { EventId = 68, OrganizerId = 48, EventName = "Huddle of Cats", StartTime = DateTime.Parse("2024-12-05T08:37:37.669Z"), Duration = 38, AllowGuests = true, EventDescription = "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Et nihil error quas, vel consectetur libero. Sunt, vero, alias reiciendis fugit corporis sint ullam quisquam expedita cumque repellendus doloribus iure repellat." },
+            new Event { EventId = 69, OrganizerId = 42, EventName = "Personalized Personalized Hangout", StartTime = DateTime.Parse("2025-12-29T04:06:31.250Z"), Duration = 29, AllowGuests = true, EventDescription = "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Et nihil error quas, vel consectetur libero. Sunt, vero, alias reiciendis fugit corporis sint ullam quisquam expedita cumque repellendus doloribus iure repellat." },
+            new Event { EventId = 70, OrganizerId = 45, EventName = "Jacob Fisher Workshop on Birthday", StartTime = DateTime.Parse("2025-12-02T18:49:26.852Z"), Duration = 97, AllowGuests = true, EventDescription = "Id, neque incidunt nisi quam nobis voluptas obcaecati blanditiis laudantium nemo ad sapiente enim numquam labore quidem quibusdam possimus sint eveniet sunt! Blanditiis commodi veritatis iste eveniet voluptatibus ratione aspernatur?" },
+            new Event { EventId = 71, OrganizerId = 51, EventName = "Congregation for Dogs", StartTime = DateTime.Parse("2025-02-09T15:15:57.858Z"), Duration = 59, AllowGuests = true, EventDescription = "Harum ipsum quo mollitia qui commodi dignissimos, aliquam reiciendis et cumque sed quisquam ducimus nisi sunt consequuntur officiis sequi optio vero quod deserunt veniam impedit? Laborum odit vero distinctio nostrum." },
+            new Event { EventId = 72, OrganizerId = 49, EventName = "Summit with Dogs", StartTime = DateTime.Parse("2025-03-14T20:29:13.239Z"), Duration = 20, AllowGuests = true, EventDescription = "Id, neque incidunt nisi quam nobis voluptas obcaecati blanditiis laudantium nemo ad sapiente enim numquam labore quidem quibusdam possimus sint eveniet sunt! Blanditiis commodi veritatis iste eveniet voluptatibus ratione aspernatur?" },
+            new Event { EventId = 73, OrganizerId = 54, EventName = "Think-tank for Dogs", StartTime = DateTime.Parse("2025-05-21T15:39:24.787Z"), Duration = 42, AllowGuests = true, EventDescription = "Soluta quos necessitatibus temporibus itaque dolore! Doloremque tempora voluptate maxime sed nam recusandae, neque mollitia distinctio rerum asperiores ea inventore consequatur earum voluptatibus dolores repellendus, ex soluta expedita eligendi tempore." }
+        );
+        context.SaveChanges();
+    }
+    private static void AddGuests(Plan2GatherContext context)
+    {
+        if (context.Guests == null) throw new NullReferenceException("Guest table is missing");
+        if (context.Guests.Any()) return;
+        context.Guests.AddRange(
+            new Guest { EventId = 66, GuestName = "Bathsheba", Times = "5ku6u|9ed5t2|94flym|6x1po1|cnxhtz|bj6b6j|3go86d|8tg4x9|hpmups|h567c7|br7md|bu6x24|946lnw#12", PasswordHash = "I3RvZG8wLjYyNTY5MjkxNzA2MDk5OA==" },
+            new Guest { EventId = 67, GuestName = "Naomi", Times = "8p46|9sv81o|bd7zrx|a1talm|ccvc80|5z2bsl|e1g6pv|d3bm0|akmpeu|5xbie6|28tm2y|chk04u|glpr2b|4ifaq|h55btf|bpcezw|8u7im4|eizqz2|98v4d9#10", PasswordHash = "I3RvZG8wLjg0MDU3NjEwMzg5MjA1OTI=" },
+            new Guest { EventId = 53, GuestName = "Susanna", Times = "m5|d43r64|hfz1uy|7pvv1z|amixf6|9cx8bz|2ie0pi|3n1pb9|3nbqcj|52cgrh|eteys9|3qj4tt|81nyau|rb1fi|5lboh2|5swh7f|dm0c12|ccc27y|7fqbv2|5qu6bo|4918wc|3f6smf|zclc4|gl0qgn|4ry42w|1k2cvv|7bzdqq#6", PasswordHash = "I3RvZG8wLjEwMDQyMTM1OTEzNjcwNzkx" },
+            new Guest { EventId = 49, GuestName = "Omer", Times = "bafr|cobeyn|30yw2j|45a0wh|eqjzaj|euwaue|ad3ebw|1kz28u|eflgfx|ev8y12|4e2e51#10", PasswordHash = "I3RvZG8wLjc3MDg3ODM0NTAyMzYxMjM=" },
+            new Guest { EventId = 73, GuestName = "Zacharias", Times = "w|8zoiss|6w4vj7|3q6dua|hfcejw|87jdef|finff9|ge8udo|5my5jp|c794fd|giwbdf|gxskkw#3" },
+            new Guest { EventId = 73, GuestName = "Bathsheba", Times = "0|1vjzdb|ae4fv5|9xztmj|f4ul2h|8cej98|11xteh|f9gh00|eymms|10p4oy|6389aj|gskmok#3" },
+            new Guest { EventId = 62, GuestName = "Zipporah", Times = "1z2dc3|azhs3k|233vh|327mtl|ao72uv|dgpvia|art3q8|g2pf79|bw3hd0|9whskx|189k66#14" },
+            new Guest { EventId = 64, GuestName = "Deborah", Times = "2jp|14sl20|98yrnz|5bylur|gr5w3t|77k56c|kchqf|a4o2tn|90xbq3|2rqdbl|4fzpmn|51u6gd|8d8vv5|6oqnkq|alql0x|59znrq|8tl95|afzwez|6ha1vw#6" },
+            new Guest { EventId = 58, GuestName = "Flora", Times = "itf|9x0kf3|6fiufn|ejadfx|a1d183|e512gp|36xe1i|eujn0c|h7x7qf|enyihd|9v3qip|6dwy0u|1dnggy|1r9vd3|erybi8|1da9er|28zmxa#8", PasswordHash = "I3RvZG8wLjk3MzUxMDY5NDA2NzA5Mzc=" },
+            new Guest { EventId = 71, GuestName = "Caleb", Times = "1mbyx|6r60zo|zhay8|9rqgq4|fo8eac|8f7hxy|6nkdfp|1thzk0|89q34o|cgddt6|1kjaux|8c71rb|ednind|80678|fvy0uu|2azytu#11" },
+            new Guest { EventId = 61, GuestName = "Abigail", Times = "h|53g7hx|ciph2o|cw169m|efg13r|79440a|15m2mc|2vacm3#3" },
+            new Guest { EventId = 68, GuestName = "Grace", Times = "0|esuvq3|2zi37p|6dlegq|198bho|86c7n1|4mmhew|fftb3l|fs3j0g|hnh1vt|fa27pc#2" },
+            new Guest { EventId = 65, GuestName = "Nathan", Times = "13dm|17rdl|9osktn|h2sfrd|2x6trp|bcw5qy|b9ryif|4pryq0|4bt1ea|gm8bg2|9c2rnn|3jsb7f|f0hr5e#8", PasswordHash = "I3RvZG8wLjI3Njc4OTIwNzI0NzcwNDY=" },
+            new Guest { EventId = 71, GuestName = "Orpah", Times = "27qxl|2n9n4o|4d0uu4|62nolg|h3zc4|35oe7h|ck8vxa|7kpf3|9knran|bsq7l7|7db6t3|19hvf6|fao805|fr1ngm|bw342d|5iofuq#11", PasswordHash = "I3RvZG8wLjI5NzMzOTg0NTgyMzczMzQ=" },
+            new Guest { EventId = 49, GuestName = "Gideon", Times = "lx24|1y4a13|2telri|ghz45c|8am3sx|48l67u|7gwri2|d0eorg|ds2drz|ba1xxt|b9ncmz#10", PasswordHash = "I3RvZG8wLjI1OTQ4NTk2NzExMDY2MzYz" },
+            new Guest { EventId = 68, GuestName = "Michael", Times = "c|gmwl5a|cjk8iv|aklubk|4dm6ue|feqnku|gvsrud|cuzoqq|8ndzvx|ev4k6q|ca0mh6#2", PasswordHash = "I3RvZG8wLjk4NTkzMjUzMzIzNDYxNTY=" },
+            new Guest { EventId = 52, GuestName = "Susanna", Times = "q|6xabfh|9c4tn2|cucnvm|6kvxdr|arwgs1#5" },
+            new Guest { EventId = 57, GuestName = "Leah", Times = "48e3|guc9ir|3xlyob|ci9n8|7t48i7|94njxd#9", PasswordHash = "I3RvZG8wLjg2NDg1NTkxMDAwOTc2NTk=" },
+            new Guest { EventId = 59, GuestName = "Hezekiah", Times = "1|olicu|eud391|ahfiq|4xht8i|11qqup|243uqj|3ymh4x|cokcog|3icrzo|b20thm|726yio|hhblq8|8r7r5u#1", PasswordHash = "I3RvZG8wLjc1MDE4MzY0MDA5MzcyMDc=" },
+            new Guest { EventId = 58, GuestName = "Elisabeth", Times = "jdp|7w6vj8|d4avdo|dq92ey|ckko2h|9ydclz|b1ajlr|do4ghx|fx9lis|3qphn4|aghbiq|h5odtg|80i0eo|7v1grl|czj9vo|1ewifo|ac8zow#8", PasswordHash = "I3RvZG8wLjA3OTg1MTgxOTk1Mjg1Mzcz" },
+            new Guest { EventId = 58, GuestName = "Reuben", Times = "11hh|b2ymt0|8ipul6|fde8i5|axtmnf|czilfe|3z3akz|dpju39|5tnq11|1mdt24|3705ry|atdosl|7l5d0g|4h0md6|7f53eq|cvrdtj|6sfh44#8", PasswordHash = "I3RvZG8wLjI4MDU4NDE4MjA1NjE2Njc1" },
+            new Guest { EventId = 52, GuestName = "Phoebe", Times = "in|eg9q1x|ekicec|cd5jxj|9k0wti|ggswr3#5" },
+            new Guest { EventId = 61, GuestName = "Zipporah", Times = "16|773gz7|aasc95|42r5oi|hkprom|1y7k82|2h5oqg|e1tcfb#3" },
+            new Guest { EventId = 69, GuestName = "Benjamin", Times = "1cq11|80jg0i|k2jlw|g1m72r|h1s4lq|eejhjp|604wrz|7ymxzr#11", PasswordHash = "I3RvZG8wLjA3MTUzODQ1ODI4NjcwNTM1" },
+            new Guest { EventId = 68, GuestName = "Phoebe", Times = "a|8ykbjt|6zxh3e|1y1cij|e5re2f|67shm6|4y6nwx|bg2cf6|he2eu5|9mevfl|8chfaf#2" },
+            new Guest { EventId = 64, GuestName = "Grace", Times = "22h|bb49ku|2f744a|8w7hpm|1vjy60|4bd649|66ib7m|7jusvf|5osc93|64ilu3|fthg11|fiwk29|c1tt8t|3le9l6|1athap|grdbnk|citi3y|9py2lm|fz0bvn#6", PasswordHash = "I3RvZG8wLjMwNjUxMjY0MzgxMTQwMTQ=" },
+            new Guest { EventId = 53, GuestName = "Tabitha", Times = "1aa|d1k0ij|8wochr|3wt7py|hh5jxz|4yuowi|dowyjx|aqxbm7|a2jzm6|dtsj9w|4g07il|3942ph|65vp0v|7dumux|9vle6i|e2t3rv|ckzlc2|6dq1mm|3i7317|2nqiat|4obema|hd2g57|2hk1vj|41w1hw|6vxz5t|1rvpje|1nhuva#6", PasswordHash = "I3RvZG8wLjAxNTU2OTkxNTMxOTE1Mjc1" },
+            new Guest { EventId = 59, GuestName = "Leah", Times = "2|6vglb7|h1flab|6a8g3j|h0y1si|filjgq|ecpt86|d3wmev|f0x0et|alt5yj|ggv2i3|hkle74|a2onr3|5bc2y5#1" },
+            new Guest { EventId = 66, GuestName = "Daniel", Times = "7e9ge|ccl5aj|gf71rg|4ktm61|g5a6gp|dad9k4|gyedrs|g2cvts|2yvs6d|1rjy2o|1vrn5f|5fexm3|81yoh8#12" },
+            new Guest { EventId = 72, GuestName = "Thomas", Times = "hb|d12m4e|bt0sek|ab24tb|f71uf0|x1i5x#5", PasswordHash = "I3RvZG8wLjc5NTYyMTk2OTkwNzM4ODE=" },
+            new Guest { EventId = 72, GuestName = "Ida", Times = "if|hm12kd|evh9ss|7jav76|26g76d|2zrh10#5", PasswordHash = "I3RvZG8wLjU2NDU4MjAwMzU4MDAyNzI=" },
+            new Guest { EventId = 56, GuestName = "Adam", Times = "3t|dmisk4|k6zj9|8no5s7|cppdd7|1tjtb1|410ucs|3j3ihm|6d0o9t|6tw5lx|44lhh|ebgvlm|g5f1wc|hh09l5|4mqhmt|ubqhj|8ykv1l|d4j4h9|ftxmu6|gv7u90|e6e3d1|csuwyg|8zzbl4|fvnlwp|fe468b#4", PasswordHash = "I3RvZG8wLjUxMzg4NDQxNjY5ODg5Njc=" }
+        );
+        context.SaveChanges();
+    }
+    private static void AddAvailabilities(Plan2GatherContext context)
+    {
+        if (context.Availabilities == null) throw new NullReferenceException("Availability table is missing");
+        if (context.Availabilities.Any()) return;
+        context.Availabilities.AddRange(
+            new Availability { EventId = 59, UserId = 57, Times = "1|4g3pki|1dh18x|7pfl48|7hd9ll|etkol5|1ce34w|hl4xw6|9d2qd5|5urwx8|f1j3n3|cu5tox|1r4mlk|dw8d8g#1" },
+            new Availability { EventId = 63, UserId = 47, Times = "3rbhhc|cfkgfx|iv1o7|75q2jc|458f2g|ao8wh5|90jcim|6fs16k|a7y8d|fo4v2d|eoc0uw|h697r4|hnhx7a|hlexvi|80qb9a|7x9thc|1nx04t|chivd1|gf4xsb#14" },
+            new Availability { EventId = 55, UserId = 55, Times = "2nxx8t|37qgz5|gt06z9|fek7vv|ggmu52|8gvmxs|atio1h|2povpe|2b9him|f0qnz|aordtz|3020jm|281iu5|c6urpd|1bhlh9|guymq2#0" },
+            new Availability { EventId = 48, UserId = 43, Times = "6|bqjxdw|fk9wrk|8bolp3|e6tst3|9zcey3|fpfh8w|6o47o6|2w2738|bzrhih|e3yos9#2" },
+            new Availability { EventId = 54, UserId = 43, Times = "4|c975xh|8hgxyb|dc2y9s|fov8fq|d2hh33|2gyckm|62z0x4|hazkcn|bnhi2i|972fok|f9d1sp|4aek7n|cor1r6|9g620l|38ok85|hov183|gczgwb|2j2y0r#2" },
+            new Availability { EventId = 61, UserId = 50, Times = "1k|cl9ntn|6puw36|h9cztq|f39g04|aj1jgo|ffco0g|4kf1vq#3" },
+            new Availability { EventId = 57, UserId = 53, Times = "m1e|dq6892|eyc4qo|a4fpop|aw9d0i|48ws1k#9" },
+            new Availability { EventId = 61, UserId = 44, Times = "15|b1qo4a|f7zoe7|gvxbh6|9fegol|aijaj8|g5n62k|1vyag4#3" },
+            new Availability { EventId = 50, UserId = 42, Times = "5dln5|19bdn5|84x89t|5x1jek|h04eq0|1rjbaa|ed4a70|f34fnm|6svcwv|34ucb1|7q9tkz|4q7kjr|4nrqlf|48wqyo#13" },
+            new Availability { EventId = 45, UserId = 44, Times = "d|euesn8|8nvmf4|85z95v|eai9zm|ajf5v2|8u7lnz|hdiahr|fzf31x|80id64|4cfmkq|hna4b|8xauv|1qr7v4|bqu8nu|5ldtay|8f02q2|50w1yv|dpftj7|dley4p|vfo0c|crupch|bdp6qr#2" },
+            new Availability { EventId = 57, UserId = 48, Times = "2fqf|8mwlu4|4e412o|xg30y|brov6p|b5n284#9" },
+            new Availability { EventId = 46, UserId = 54, Times = "r7|5o28cg|8mtkmm|3svet9|blej94|eb3gxf|4c60ww|6jkt56|azq2pp|9w9b3v|8ind46|2ifbc6|f2t6ik|bm2ing|6ave6f|3l7yno|36xur3|7k5h0x|h3cwnh|4m5074|161oj|5e9lr7|6sgi5w#6" },
+            new Availability { EventId = 64, UserId = 50, Times = "1n|aolgke|1aupjk|hj1fx4|8xemsp|7s1txj|6unx1y|ewa83z|29qipq|114v3a|bznu3d|8wxv9o|bt4e6s|ukzag|5e7gwd|1o2sta|2ff1vn|7l9ndh|aom89l#6" },
+            new Availability { EventId = 72, UserId = 55, Times = "d3|e4p5ds|70mq2f|cufytn|fel215|5nz3it#5" },
+            new Availability { EventId = 58, UserId = 45, Times = "amy|a2lirc|fetrq8|8r8en2|zywf|8l4qjb|343di0|8tlhm1|7ymoqn|3ikpus|fq30j2|1wxfoj|h8tn3f|4jnwp7|dh03j4|bvsnj2|bc6aln#8" },
+            new Availability { EventId = 56, UserId = 52, Times = "69|3wtl8v|4xhs5p|jy12|7rmexe|a07ijz|9j45tl|gytu4q|dy16rv|et90ni|2it959|8sjzr3|fj2z4o|8wee0c|fq39pl|jqkv|hqskgh|b675iv|2141gt|9qso1m|7uwxa|9h5bis|9pumnz|gu56j9|frztke#4" },
+            new Availability { EventId = 56, UserId = 56, Times = "1z|80kxf|gnxoxw|aupdw3|ctswmz|5r85d0|a5pdck|2zkc37|5xt5ma|8s98z8|4w8rfx|8xznm9|e96k8t|4vbdpq|auscwj|72ld8w|e0upbo|c23y3j|7nye7a|guktcx|e266hq|3hawba|58eq41|626n9m|en4u4d#4" },
+            new Availability { EventId = 72, UserId = 48, Times = "ef|d6gfew|xkswi|7d40sd|at5uco|d95aye#5" },
+            new Availability { EventId = 62, UserId = 56, Times = "2fbyeu|e0fr78|7w13zu|gqi3vg|atbnad|7e98nf|8oxw3q|66vkoe|hmh1p9|7h6db5|6cslrc#14" },
+            new Availability { EventId = 68, UserId = 57, Times = "1|bvg0d1|hbo97s|8hgnvr|4j5ogi|c12e4b|50w6zp|fs1e5i|dvrg3f|cciw0t|d81fyv#2" },
+            new Availability { EventId = 44, UserId = 49, Times = "3gimt|hr398u|a6f73a|gqtc3y|37upqx|emcpyr|guqkei|54lbjw|6y7zwg|1cy8g0|3af2yu|5ggbvd|4s2i21|a0gpd8|2d52p7|7s86fk|5pmkpu|bnbgxw|sy934|ec2f4h|80lo0e|ba2cla|72lap8|9q1sze|2ub0ip#12" },
+            new Availability { EventId = 42, UserId = 53, Times = "lc|8gwf95|1iaag3|9fdo1a|aj38sm|ekjqvp|b85dcf|eeuybo|7hbc60|aq867k|2idqie|gh3x0z|89tfky|9ihkkb|e72fh0|bhxwo8|9n5y75|76bz77#5" },
+            new Availability { EventId = 69, UserId = 47, Times = "1hdj|g3xn5f|enylft|9mieut|264byz|6rx4sm|7jdc9j|amfs8z#11" },
+            new Availability { EventId = 42, UserId = 51, Times = "es|1qmnoc|7icwwh|dattgf|hfmp0|77vk8x|3e8vj0|6jvt1t|4n1x91|2xtwpl|aez9ci|fke8am|ajca5c|4j54pk|91apii|rdecw|bp0ol5|bcm5r5#5" },
+            new Availability { EventId = 57, UserId = 47, Times = "3d3y|jd3h9|gzmvts|acxdeb|h2g67i|gtc944#9" },
+            new Availability { EventId = 55, UserId = 54, Times = "a4beb5|argfoc|3ca8rd|2vhgd0|6n4rez|hate0x|5ujtre|6pkw1g|2m59y4|5m5d32|5ol7we|erc1ji|58nqf4|diuzjn|ha74on|ekw9fb#0" },
+            new Availability { EventId = 71, UserId = 49, Times = "sy0n|3fxq73|h49woh|357f0l|9gtgfs|g3u0wc|ghx88j|5h7lgl|1mdfhd|hnc3i9|9h2g5o|8rx5sw|1lkaet|1dge3x|bpftqd|8aq43h#11" },
+            new Availability { EventId = 47, UserId = 51, Times = "1df|82pb7f|btepdo|4anl4|6duar7|9kpp93|5yyyv4|4tzep9|5xtz91|e5iggb|9zyuny|cbobj7|46u6nd|b6nlae|4pdymj#6" },
+            new Availability { EventId = 44, UserId = 47, Times = "4983k|7g4nx0|f3ybxf|2cuitu|687b77|eep3th|abv4uk|dklndt|5dhswp|fp3oi4|ho4fr2|eelhv3|djo8sr|g98zha|8zf31k|67vtwa|590kte|anv2r7|1396ga|7azrho|384ofh|36ziyx|7b230e|fnujdv|am2ttt#12" },
+            new Availability { EventId = 57, UserId = 46, Times = "2h4b|amhmd8|fvgy88|fvmpq8|49q7ts|8omrk6#9" },
+            new Availability { EventId = 51, UserId = 43, Times = "e|b3rn4g|1yoz02|4f3tk7|b1bue7|1o4the|dvmorl|4tkdb6#3" },
+            new Availability { EventId = 44, UserId = 56, Times = "6pvyn|9iiory|hc40vj|c48u5u|cli1on|9ly7js|lqzea|dd9t8c|6cz1fj|29gv8|40ff8h|g0g35f|ec10kw|81i3v0|1fw4cp|hdgyn|ecwdfc|2vllrh|bbnzvw|fkfr0z|2d1j4c|3ebr2z|b825nu|zpyig|b159bq#12" },
+            new Availability { EventId = 66, UserId = 46, Times = "7a3u8|h1pbp0|cxz37b|3aki05|7k2xz3|aghr4s|36mupm|bgslkh|4axe1f|81ky4f|dnskor|7z5ddk|c3i3vv#12" },
+            new Availability { EventId = 47, UserId = 56, Times = "2vn|bpkbq|gwjvmi|95af15|dcu87h|ffvqzg|fg06kv|aibtef|61a7da|20331f|g6m2d5|3ylwdm|ele10c|9h2ij|dvk837#6" },
+            new Availability { EventId = 66, UserId = 52, Times = "73co9|3edzd6|ahlhip|4be2mv|8nout6|84fkeu|dqbo7v|go4fyd|8ovska|9mbzen|4br6yw|d2h3j4|6hcgdy#12" },
+            new Availability { EventId = 54, UserId = 49, Times = "1|g8tb7s|aw7d1h|2dn2fo|e3el9m|bl6v6m|2bmyad|76dk19|2lsbm9|508kw6|gg1wij|f7phnl|2grxup|4kotwg|fjiz6s|egel75|77ox8x|6ko40x|d2kdwo#2" },
+            new Availability { EventId = 52, UserId = 57, Times = "q0|dk7mbw|5padl|bl9oq2|cgdymz|8g6yz#5" },
+            new Availability { EventId = 58, UserId = 46, Times = "r5k|dd7ffq|1t8m6i|7dz3yp|cm6ifc|1z6o0p|7hb5oz|atkd0p|7dv011|5htxww|s67cn|5kg35z|5hdz69|3foxl5|hgrdt8|f50eu7|bmbp99#8" },
+            new Availability { EventId = 48, UserId = 54, Times = "c|699h|76nurc|h2o2w7|5hu2v5|f5y4xy|ctvnv8|7rhzhf|90xln4|4s5xff|8ocdo3#2" },
+            new Availability { EventId = 51, UserId = 47, Times = "h|3ni67n|40sf49|fmszha|1a6cjn|9mvfbk|dj54b6|cbqlu0#3" },
+            new Availability { EventId = 46, UserId = 46, Times = "3l|hhtaph|a2ipt1|3rxgmt|e5p1ql|6j2iyd|27v1sa|9bex3h|4tbuf8|4dtw0t|1pfzyw|5c42ua|9hxysi|fu5kct|hooto9|ejc6ew|bd6hpn|3od205|99vc6f|fgu00m|fzdnlh|cwrxg4|z03mk#6" },
+            new Availability { EventId = 49, UserId = 45, Times = "j7b4|ciexte|1lfiol|7mxvbf|7dbjro|guunud|2fzqna|2xrv6s|fvxu7n|a1fgta|6idjkw#10" },
+            new Availability { EventId = 71, UserId = 45, Times = "1kmm6|bsaqgx|1gqup2|15nsit|ecfgdo|hdyai|8hoq1r|2s0vpn|f59f08|5gu8xo|63q065|co0zvf|4yyc2b|f3evq9|6jrr3j|83gli0#11" },
+            new Availability { EventId = 49, UserId = 54, Times = "3scg|c3z9dp|1la0rn|2fm8cu|a0266r|frjqz0|2k5fu|g9emja|azoy0r|d3ikig|8m9gmg#10" },
+            new Availability { EventId = 51, UserId = 50, Times = "r|dhiz8j|gjh0w1|7j9x5a|5tpdnj|d2ith9|97a8xx|p7no4#3" },
+            new Availability { EventId = 69, UserId = 43, Times = "1ivyk|afcik3|coefry|98najq|c0ahhk|eyfas9|ay0ani|hb8nvz#11" },
+            new Availability { EventId = 66, UserId = 45, Times = "30xoq|2tui3s|8p8mtu|1rqf38|9l1ru6|e5vcy2|gh1cjl|gllg1v|baagds|g9gogn|dktoeu|darvsj|gwqu4g#12" },
+            new Availability { EventId = 57, UserId = 45, Times = "3z6p|1xe0hz|hdtoc7|fjeiaw|bkyf8k|etfwrn#9" },
+            new Availability { EventId = 64, UserId = 47, Times = "23b|31serw|axrsxu|2jgpc8|bw8b7n|227rve|bv3vid|3ozb3g|h8rl7j|bzhaoq|ccbkbe|f7ro46|8868ap|x05ow|fcu9vf|42l7lj|g5ywpw|bnvtym|7f1s6#6" },
+            new Availability { EventId = 47, UserId = 49, Times = "l1|f3sq03|4tiwtf|w3d2x|8yx234|cwoeva|anphmq|eviq57|4xq827|dlgh03|yprpn|dyheac|eiwj6j|5861c5|az1164#6" },
+            new Availability { EventId = 69, UserId = 50, Times = "1dir9|2ob9qe|2rbdzb|h8wo1n|42m1yp|7zev27|1s80r3|a00hlx#11" },
+            new Availability { EventId = 68, UserId = 51, Times = "6|e5zjo8|7r1koz|a6fe1x|ec7z4i|fr3h6m|2n6dac|1eqngr|bsiy46|8xq93u|esy4lj#2" },
+            new Availability { EventId = 66, UserId = 55, Times = "6tvyp|ds9x0w|ew5sx7|ftxi3|hkrruq|7d79ar|2pu0ua|cf13cl|yb42x|48kfr8|7ksiyy|2p8a2u|9rpime#12" },
+            new Availability { EventId = 43, UserId = 42, Times = "m|9v1f19|3s9f5c|7018w9|256ttf|ehd5vr|3p1m12|eyw9ca#3" },
+            new Availability { EventId = 63, UserId = 44, Times = "9jo29|4wp5mu|9sa7ib|4w3wr9|80plvj|fqah8|4pxuug|56d4um|fkxb0l|fjmkke|21n8ag|f8hryk|fhfbjc|3qe2t8|fdbyj0|41im7v|gpezjd|6pgr9j|czhi5w#14" },
+            new Availability { EventId = 67, UserId = 53, Times = "6e57|63szdl|9kzrwl|dgl9sb|4rbni3|3rzin7|94zye8|4opvqq|42l2mq|2b1spj|2oxw4l|21y6bm|6apr7a|3nu75n|ac524l|d1ap82|52xsmo|bnb5ha|w4nij#10" },
+            new Availability { EventId = 44, UserId = 55, Times = "6zezb|4qwuz7|2p85uh|9d7b6|7rtbfr|dv14r4|43epvo|g9dnwd|eqj0y1|3k8dku|91pcab|1bogjy|3lkipg|adotv0|5srv8a|awjqp|es1r2a|cotood|ai9szr|50w7iu|84wlhz|hnt700|2tkyju|caohgd|grsfds#12" },
+            new Availability { EventId = 42, UserId = 43, Times = "j1|74ft7x|4z050o|8kvuxm|wwb8o|76ne8m|23jjuf|bty5ma|4m4903|3lja8h|c223ch|1auwi|av7nd|1z8m6p|d5nz7s|7inbgl|2myl96|bu1rl9#5" },
+            new Availability { EventId = 57, UserId = 42, Times = "1tc9|e2sz41|63aql0|6k06mr|1ndckb|c025y7#9" }
+        );
+        context.SaveChanges();
+    }
+}

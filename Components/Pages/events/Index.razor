@@ -1,0 +1,45 @@
+@page "/events"
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Plan2Gather.Components
+@using Plan2Gather.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<Plan2GatherContext> DbFactory
+
+<PageTitle>Events</PageTitle>
+
+<h1>Events</h1>
+
+<div><input type="search" @bind="filter" @bind:event="oninput"></div>
+
+<p><a href="events/create">Make new</a></p>
+
+<div>
+    <QuickGrid Class="table" Items="FilteredEvents" Pagination="pagination">
+        <PropertyColumn Property="evnt => evnt.EventId" Sortable="true" Title="ID" />
+        <PropertyColumn Property='evnt => evnt.OrganizerId' Sortable="true" Title="Org. ID" />
+        <PropertyColumn Property="evnt => evnt.EventName" Sortable="true" Title="Event name" />
+        <PropertyColumn Property="evnt => evnt.StartTime" Sortable="true" Title="Start time" />
+        <PropertyColumn Property='evnt => evnt.Duration' Sortable="true" Title="Range" />
+        <PropertyColumn Property='evnt => evnt.AllowGuests' Sortable="true" Title="Allows guest" />
+        <PropertyColumn Property='evnt => evnt.EventDescription.Substring(0,15)+"..."' Sortable="true" Title="Description" />
+
+        <TemplateColumn Context="evnt">
+            <a href="@($"events/edit?id={evnt.EventId}")">Edit</a>
+            <a href="@($"events/details?id={evnt.EventId}")">Details</a>
+            <a href="@($"events/delete?id={evnt.EventId}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+</div>
+
+<Paginator State="pagination" />
+
+@code {
+    private Plan2GatherContext context = default!;
+    private PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+    private string filter = string.Empty;
+    private IQueryable<Plan2Gather.Models.Event> FilteredEvents => context.Events.Where(u => u.EventName.Contains(filter));
+    protected override void OnInitialized() => context = DbFactory.CreateDbContext();
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

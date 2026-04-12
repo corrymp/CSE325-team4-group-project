@@ -1,0 +1,52 @@
+@page "/users/create"
+@using Microsoft.EntityFrameworkCore
+@using Plan2Gather.Models
+@inject IDbContextFactory<Plan2Gather.Data.Plan2GatherContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>User</h2>
+
+<hr>
+
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="user" OnValidSubmit="AddUser" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+            <div class="mb-3">
+                <label for="name" class="form-label">Username:</label>
+                <InputText id="name" @bind-Value="user.UserName" class="form-control" />
+                <ValidationMessage For="() => user.UserName" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="type" class="form-label">Account type:</label>
+                <InputDate id="type" @bind-Value="user.UserType" class="form-control" />
+                <ValidationMessage For="() => user.UserType" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <InputText id="email" @bind-Value="user.Email" class="form-control" />
+                <ValidationMessage For="() => user.Email" class="text-danger" />
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div><a href="/users">Back to List</a></div>
+
+@code {
+    [SupplyParameterFromForm] private User user { get; set; } = default!;
+    protected override void OnInitialized() {}
+    private async Task AddUser()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/users");
+    }
+}

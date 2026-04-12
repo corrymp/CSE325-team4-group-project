@@ -1,0 +1,45 @@
+@page "/guests/details"
+@using Microsoft.EntityFrameworkCore
+@using Plan2Gather.Models
+@using Plan2Gather.Data
+@inject IDbContextFactory<Plan2Gather.Data.Plan2GatherContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Guest Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Guest</h2>
+    <hr>
+    @if (guest is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">Event ID</dt>
+            <dd class="col-sm-10">@guest.EventId</dd>
+
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@guest.GuestName</dd>
+        </dl>
+        <div>
+            <a href="@($"/guests/edit?id={guest.EventId}&name={guest.GuestName}")">Edit</a> |
+            <a href="@($"/guests")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Guest? guest;
+    [SupplyParameterFromQuery] private int Id { get; set; }
+    [SupplyParameterFromQuery] private string Name { get; set; } = string.Empty;
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        guest = await context.Guests.AsNoTracking().FirstOrDefaultAsync(g => g.EventId == Id && g.GuestName == Name);
+        if (guest is null) NavigationManager.NotFound();
+    }
+}

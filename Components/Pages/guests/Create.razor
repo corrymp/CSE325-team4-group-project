@@ -1,0 +1,53 @@
+@page "/guests/create"
+@using Microsoft.EntityFrameworkCore
+@using Plan2Gather.Models
+@inject IDbContextFactory<Plan2Gather.Data.Plan2GatherContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create Guest</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Guest</h2>
+
+<hr>
+
+<div class="row">
+    <div class="col-md-4">
+        <span class="text-danger">WARNING: There is a high likelyhood that you will be unable to enter a valid availability string. Adding availabilities with this form is NOT recommended.</span>
+        <EditForm method="post" Model="guest" OnValidSubmit="AddGuest" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label>
+                <InputText id="name" @bind-Value="guest.GuestName" class="form-control" />
+                <ValidationMessage For="() => guest.GuestName" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="event" class="form-label">Event ID:</label>
+                <InputDate id="event" @bind-Value="guest.EventId" class="form-control" />
+                <ValidationMessage For="() => guest.EventId" class="text-danger" />
+            </div>
+            <div class="mb-3">
+                <label for="times" class="form-label">Encoded availability string:</label>
+                <InputText id="times" @bind-Value="guest.Times" class="form-control" />
+                <ValidationMessage For="() => guest.Times" class="text-danger" />
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div><a href="/guests">Back to List</a></div>
+
+@code {
+    [SupplyParameterFromForm] private Guest guest { get; set; } = default!;
+    protected override void OnInitialized() {}
+    private async Task AddGuest()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Guests.Add(guest);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/guests");
+    }
+}

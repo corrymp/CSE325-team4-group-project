@@ -1,0 +1,48 @@
+@page "/availabilities/details"
+@using Microsoft.EntityFrameworkCore
+@using Plan2Gather.Models
+@using Plan2Gather.Data
+@inject IDbContextFactory<Plan2Gather.Data.Plan2GatherContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Availability Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Availability</h2>
+    <hr>
+    @if (availability is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">Event ID</dt>
+            <dd class="col-sm-10">@availability.EventId</dd>
+
+            <dt class="col-sm-2">User ID</dt>
+            <dd class="col-sm-10">@availability.UserId</dd>
+
+            <dt class="col-sm-2">Encoded availability string</dt>
+            <dd class="col-sm-10">@availability.Times</dd>
+        </dl>
+        <div>
+            <a href="@($"/availabilities/edit?user={availability.UserId}&event={availability.EventId}")">Edit</a> |
+            <a href="@($"/availabilities")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Availability? availability;
+    [SupplyParameterFromQuery] private int User { get; set; }
+    [SupplyParameterFromQuery] private int Event { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        availability = await context.Availabilities.AsNoTracking().FirstOrDefaultAsync(a => a.EventId == Event && a.UserId == User);
+        if (availability is null) NavigationManager.NotFound();
+    }
+}

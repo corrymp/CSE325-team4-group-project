@@ -1,0 +1,51 @@
+@page "/users/details"
+@using Microsoft.EntityFrameworkCore
+@using Plan2Gather.Models
+@using Plan2Gather.Data
+@inject IDbContextFactory<Plan2Gather.Data.Plan2GatherContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>User</h2>
+    <hr>
+    @if (user is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <dl class="row">
+            <dt class="col-sm-2">ID</dt>
+            <dd class="col-sm-10">@user.UserId</dd>
+
+            <dt class="col-sm-2">Username</dt>
+            <dd class="col-sm-10">@user.UserName</dd>
+
+            <dt class="col-sm-2">Account type</dt>
+            <dd class="col-sm-10">@user.UserType</dd>
+
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@(user.Email ?? "None")</dd>
+        </dl>
+        <div>
+            <a href="@($"/users/edit?id={user.UserId}")">Edit</a> |
+            <a href="@($"/users")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private User? user;
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        user = await context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.UserId == Id);
+        if (user is null) NavigationManager.NotFound();
+    }
+}

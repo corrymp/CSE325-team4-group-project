@@ -1,0 +1,76 @@
+@page "/guests/edit"
+@using Microsoft.EntityFrameworkCore
+@using Plan2Gather.Models
+@inject IDbContextFactory<Plan2Gather.Data.Plan2GatherContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit Guest</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Guest</h2>
+
+<hr>
+
+@if (Guest is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+        <span class="text-danger">WARNING: There is a high likelyhood that you will be unable to enter a valid availability string. Adding availabilities with this form is NOT recommended.</span>
+            <EditForm method="post" Model="Guest" OnValidSubmit="UpdateGuest" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert" />
+                <input type="hidden" name="Guest.EventId" value="@Guest.EventId" />
+                <div class="mb-3">
+                    <p>Event ID: <em>@Guest.EventId</em></p>
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="Guest.GuestName" class="form-control" />
+                    <ValidationMessage For="() => Guest.GuestName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="times" class="form-label">Encoded availability string:</label>
+                    <InputText id="times" @bind-Value="Guest.Times" class="form-control" />
+                    <ValidationMessage For="() => Guest.Times" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div><a href="/guests">Back to List</a></div>
+
+@code {
+    [SupplyParameterFromQuery] private int Id { get; set; }
+    [SupplyParameterFromQuery] private string Name { get; set; } = string.Empty;
+    [SupplyParameterFromForm] private Guest? Guest { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Guest ??= await context.Guests.FirstOrDefaultAsync(g => g.EventId == Id && g.GuestName == Name);
+        if (Guest is null) NavigationManager.NotFound();
+    }
+    private async Task UpdateGuest()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Guest!).State = EntityState.Modified;
+        try { await context.SaveChangesAsync(); }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!GuestExists(Guest!.EventId, Guest.GuestName)) NavigationManager.NotFound();
+            else throw;
+        }
+        NavigationManager.NavigateTo("/guests");
+    }
+    private bool GuestExists(int id, string name)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Guests.Any(g => g.EventId == id && g.GuestName == name);
+    }
+}

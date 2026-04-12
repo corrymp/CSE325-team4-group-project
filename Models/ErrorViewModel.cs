@@ -1,8 +1,6 @@
-namespace HangoutPlanner.Models;
-
+namespace Plan2Gather.Models;
 public class ErrorViewModel
 {
     public string? RequestId { get; set; }
-
     public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 }

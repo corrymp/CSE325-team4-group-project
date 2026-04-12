@@ -1,0 +1,76 @@
+@page "/availabilities/edit"
+@using Microsoft.EntityFrameworkCore
+@using Plan2Gather.Models
+@inject IDbContextFactory<Plan2Gather.Data.Plan2GatherContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit Availability</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Availability</h2>
+
+<hr>
+
+@if (availability is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <span class="text-danger">WARNING: There is a high likelyhood that you will be unable to enter a valid availability string. Editing availabilities in this form is NOT recommended.</span>
+            <EditForm method="post" Model="availability" OnValidSubmit="UpdateAvailability" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert" />
+                <input type="hidden" name="Availability.AvailabilityId" value="@availability.EventId" />
+                <input type="hidden" name="Availability.AvailabilityId" value="@availability.UserId" />
+    
+                <div class="mb-3">
+                    <p>Event ID: <em>@availability.EventId</em></p>
+                </div>
+                <div class="mb-3">
+                    <p>User ID: <em>@availability.UserId</em></p>
+                </div>
+                <div class="mb-3">
+                    <label for="times" class="form-label">Encoded availability string:</label>
+                    <InputText id="times" @bind-Value="availability.Times" class="form-control" />
+                    <ValidationMessage For="() => availability.Times" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div><a href="/availabilities">Back to List</a></div>
+
+@code {
+    [SupplyParameterFromQuery] private int User { get; set; }
+    [SupplyParameterFromQuery] private int Event { get; set; }
+    [SupplyParameterFromForm] private Availability? availability { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        availability ??= await context.Availabilities.FirstOrDefaultAsync(a => a.EventId == Event && a.UserId == User);
+        if (availability is null) NavigationManager.NotFound();
+    }
+    private async Task UpdateAvailability()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(availability!).State = EntityState.Modified;
+        try { await context.SaveChangesAsync(); }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!AvailabilityExists(availability!.UserId, availability.EventId)) NavigationManager.NotFound();
+            else throw;
+        }
+        NavigationManager.NavigateTo("/availabilities");
+    }
+    private bool AvailabilityExists(int user, int evnt)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Availabilities.Any(a => a.UserId == user && a.EventId == evnt);
+    }
+}
