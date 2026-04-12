@@ -8,3 +8,4 @@ Members:
 - Saúl Carracelas González-Albo
 - Vitalina Syzova
 - Estefanía Sagrario Ortíz Ramírez
+- Paul Lukwago
