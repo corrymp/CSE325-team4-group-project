@@ -21,7 +21,7 @@
                     <div class="alert alert-danger" role="alert">@_error</div>
                 }
 
-                <EditForm Model="this" OnSubmit="HandleLogin">
+                <EditForm FormName="login-form" Model="this" OnSubmit="HandleLogin">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
                         <input type="text" id="username" class="form-control" placeholder="Username" @bind="_username" required />
