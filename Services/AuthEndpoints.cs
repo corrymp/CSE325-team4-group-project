@@ -1,3 +1,4 @@
+using System.Net.Mail;
 using BCrypt.Net;
 using Microsoft.EntityFrameworkCore;
 using Plan2Gather.Data;
@@ -26,10 +27,8 @@ public static class AuthEndpoints
         if (req.Password != req.ConfirmPassword)
             return Results.BadRequest("Passwords do not match.");
 
-        // Usernames must be unique (case-insensitive)
-        bool taken = await db.Users.AnyAsync(u => u.UserName.ToLower() == req.UserName.ToLower());
-        if (taken)
-            return Results.BadRequest("Username is already taken.");
+
+        // The username must be unique if the user is registering without an email, otherwise it may be a duplicate
 
         // Email uniqueness (only when provided)
         if (!string.IsNullOrWhiteSpace(req.Email))
@@ -38,6 +37,14 @@ public static class AuthEndpoints
             if (emailTaken)
                 return Results.BadRequest("An account with that email already exists.");
         }
+        else
+        {
+            // Non-email account usernames must be unique (case-insensitive)
+            bool taken = await db.Users.AnyAsync(u => u.UserName.ToLower() == req.UserName.ToLower());
+            if (taken)
+                return Results.BadRequest("Username is already taken.");
+        }
+
         User.UserTypes userType;
 
         if (!Enum.TryParse<User.UserTypes>(req.AccountType, true, out userType))
@@ -70,7 +77,13 @@ public static class AuthEndpoints
         if (string.IsNullOrWhiteSpace(req.UserName) || string.IsNullOrWhiteSpace(req.Password))
             return Results.BadRequest("Username and password are required.");
 
-        var user = await db.Users.FirstOrDefaultAsync(u => u.UserName.ToLower() == req.UserName.ToLower());
+        User? user;
+        if(MailAddress.TryCreate(req.UserName, out var email))
+        {
+            var emailStr = email.ToString();
+            user = await db.Users.FirstOrDefaultAsync(u => u.Email != null && u.Email == emailStr);
+        }
+        else user = await db.Users.FirstOrDefaultAsync(u => u.UserName.ToLower() == req.UserName.ToLower());
 
         if (user is null || string.IsNullOrWhiteSpace(user.PasswordHash))
             return Results.Unauthorized();
