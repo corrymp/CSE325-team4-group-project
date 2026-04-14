@@ -1,81 +1,112 @@
-/* Full-width blue header */
+/* Blue header */
 .blue-header {
-    background-color: #1b6ec2;
-    width: 100%;
-    margin: 0;
-    padding: 0.5rem 0;
+    background-color: #0d6efd;
+    color: white;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Yellow rectangle buttons (Register/Login) */
-.auth-buttons .btn-warning {
-    background-color: #ffc107;
-    border-color: #ffc107;
-    color: #000;
-    font-weight: 500;
-    padding: 0.25rem 1rem;
-    border-radius: 0.2rem;
-}
-
-.auth-buttons .btn-warning:hover {
-    background-color: #e0a800;
-    border-color: #d39e00;
-}
-
-/* Orange button on home page */
+/* Orange custom button */
 .btn-orange {
     background-color: #fd7e14;
     border-color: #fd7e14;
     color: white;
-    font-weight: bold;
-    padding: 0.75rem 2rem;
-    border-radius: 0.3rem;
 }
-
 .btn-orange:hover {
-    background-color: #e96b0b;
-    border-color: #dc650a;
+    background-color: #e96a0a;
+    border-color: #dc6509;
+    color: white;
+}
+.btn-orange:focus, .btn-orange:active {
+    background-color: #dc6509;
+    border-color: #c95c08;
     color: white;
 }
 
-/* Hide default navbar if any (in case layout had one) */
-.navbar {
-    display: none;
-}
-
-/* Dark mode styles */
-body.dark-mode {
+/* ===== GLOBAL DARK MODE (always on) ===== */
+body {
     background-color: #121212;
     color: #e0e0e0;
 }
 
-body.dark-mode .blue-header {
-    background-color: #0a2b4e;
-}
-
-body.dark-mode .btn-orange {
-    background-color: #e06c00;
-    border-color: #e06c00;
-}
-
-body.dark-mode .btn-warning {
-    background-color: #f0b400;
-    border-color: #d39e00;
-    color: #000;
-}
-
-body.dark-mode .card,
-body.dark-mode .table,
-body.dark-mode .border {
+.card {
     background-color: #1e1e1e;
     border-color: #333;
 }
 
-body.dark-mode a:not(.btn) {
-    color: #8bb9fe;
+.card-title, .card-body {
+    color: #e0e0e0;
 }
 
-body.dark-mode .footer {
-    background-color: #1e1e1e;
-    border-top-color: #333;
+.form-control, .form-select {
+    background-color: #2c2c2c;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+    border-color: #0d6efd;
+}
+
+.alert-danger {
+    background-color: #442a2a;
+    color: #ffb4b4;
+    border-color: #5c3a3a;
+}
+
+hr {
+    border-color: #333;
+}
+
+/* Links */
+a {
+    color: #66b0ff;
+}
+a:hover {
+    color: #99ccff;
+}
+
+/* Additional styles from original layout */
+a.navbar-brand {
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+.border-top {
+    border-top: 1px solid #e5e5e5;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+    font-size: 1rem;
+    line-height: inherit;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px;
 }
