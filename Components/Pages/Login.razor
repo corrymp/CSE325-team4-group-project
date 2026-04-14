@@ -1,51 +1,49 @@
 @page "/login"
+@rendermode InteractiveServer
 @using System.Net.Http.Json
 @using Plan2Gather.Auth
 @using Plan2Gather.Services
 @inject NavigationManager Nav
 @inject JwtAuthStateProvider AuthState
 @inject ApiHttpClientFactory ApiFactory
-@rendermode InteractiveServer
 
 <PageTitle>Login</PageTitle>
 
-<section class="auth-section">
-    <EditForm Model="this" FormName="loginForm" OnSubmit="HandleLogin">
-        <h2>Sign in to your account</h2>
-        <hr />
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">Sign in to your account</h2>
+                <hr />
 
-        @if (!string.IsNullOrEmpty(_error))
-        {
-            <div class="text-danger" role="alert">@_error</div>
-        }
+                @if (!string.IsNullOrEmpty(_error))
+                {
+                    <div class="alert alert-danger" role="alert">@_error</div>
+                }
 
-        <fieldset>
-            <input type="text"
-                   id="username"
-                   placeholder="Username"
-                   @bind="_username"
-                   required />
-            <label for="username">Username</label>
-        </fieldset>
+                <EditForm Model="this" OnSubmit="HandleLogin">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" id="username" class="form-control" placeholder="Username" @bind="_username" required />
+                    </div>
 
-        <fieldset>
-            <input type="password"
-                   id="password"
-                   placeholder="Password"
-                   @bind="_password"
-                   required />
-            <label for="password">Password</label>
-        </fieldset>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" class="form-control" placeholder="Password" @bind="_password" required />
+                    </div>
 
-        <button type="submit" disabled="@_loading">
-            @(_loading ? "Signing in…" : "Log in")
-        </button>
+                    <button type="submit" class="btn btn-orange w-100" disabled="@_loading">
+                        @(_loading ? "Signing in…" : "Log in")
+                    </button>
 
-        <fieldset>
-            <p>Don't have an account? <a href="/register">Register</a></p>
-        </fieldset>
-    </EditForm>
-</section>
+                    <div class="text-center mt-3">
+                        <p>Don't have an account? <a href="/register">Register</a></p>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
     private string _username = "";
