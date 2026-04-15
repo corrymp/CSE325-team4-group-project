@@ -4,6 +4,7 @@
 @using Plan2Gather.Data
 @inject IDbContextFactory<Plan2Gather.Data.Plan2GatherContext> DbFactory
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 
 <PageTitle>@if(evnt is null){@("Loading")}else{@evnt.EventName}</PageTitle>
 
@@ -66,9 +67,7 @@
 
 @code{
     [SupplyParameterFromQuery] private int id {get; set;}
-
     private Plan2Gather.Models.Event? evnt;
-
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();

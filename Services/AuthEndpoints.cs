@@ -47,7 +47,6 @@ public static class AuthEndpoints
         User.UserTypes userType = req.AccountType;
 
         if (userType == User.UserTypes.NONE)
-        {
             return Results.BadRequest("Invalid account type.");
 
         if (userType == User.UserTypes.FULL && string.IsNullOrWhiteSpace(req.Email))

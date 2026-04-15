@@ -1,4 +1,4 @@
-
+{// code adapted from when2meet pending in-house implementation
 const clamp = (n,min,max) => Math.max(Math.min(max,n),min),Months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],DaysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
 let topLeft = null,DateLoaded = null,sunday=null,IsMouseDownDates = false,IsMouseDownSideLabel = false,IsMouseDownTopLabel = false,AnchorRow = 0,AnchorColumn = 0,HoverRow = 0,HoverColumn = 0,WriteMode = "",Dates = [],xMousePos,yMousePos,xMouseRef,yMouseRef;
 
@@ -78,7 +78,6 @@ function ReColor() {
     }
 }
 
-
 function AddHighlightedDates(HighlightedDates) {
     let DateNum = -1;
     while (DateNum < HighlightedDates.length) {
@@ -146,8 +145,6 @@ document.addEventListener('mousemove',e=>{
         }
     }
 });
-
-
 
 function prevDef(e){e.preventDefault()}
 const Calendar = document.getElementById('calendar');
@@ -267,7 +264,6 @@ document.querySelectorAll('.cal-week').forEach((el,i)=>{
     el.addEventListener('mousedown', MouseDownTopLabel);
 });
 
-
 function ShiftToDate(NewTopLeftDate, ShiftToLeft) {
     const OldStartTimeString = document.getElementById("dateOf-1-1").value.split("-");
     const NewStartTimeString = NewTopLeftDate.split("-");
@@ -300,7 +296,6 @@ document.getElementById('form').onsubmit=()=>{
     return true;
 }
 
-
 function PageLoaded() {
     DateLoaded=Calendar.dataset.loaded;
     sunday = Calendar.dataset.sunday;
@@ -311,4 +306,4 @@ function PageLoaded() {
 
 addEventListener('load',PageLoaded);
 
-
+}

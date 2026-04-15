@@ -1,6 +1,6 @@
 using System;
 
-namespace CSE325_team4_group_project.Models
+namespace Plan2Gather.Models
 {
     public class AppNotification
     {

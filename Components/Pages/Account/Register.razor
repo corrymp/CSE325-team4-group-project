@@ -1,4 +1,4 @@
-@page "/register"
+@page "/register_other"
 @rendermode InteractiveServer
 @using System.Net.Http.Json
 @using Microsoft.EntityFrameworkCore.Metadata.Internal
@@ -125,7 +125,9 @@
         try
         {
             var client = ApiFactory.Create();
-            var payload = new RegisterRequest(_username, _password, _confirmPassword, _accountType, string.IsNullOrWhiteSpace(_email) ? null : _email);
+            var payload = new RegisterRequest(
+                _username, _password, _confirmPassword, 
+                _accountType, string.IsNullOrWhiteSpace(_email) ? null : _email);
             var response = await client.PostAsJsonAsync("/api/auth/register", payload);
 
             if (response.IsSuccessStatusCode)

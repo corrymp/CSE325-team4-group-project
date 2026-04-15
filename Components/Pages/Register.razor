@@ -1,7 +1,11 @@
 @page "/register"
+@rendermode InteractiveServer
 @using System.Net.Http.Json
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
 @using Plan2Gather.Auth
 @using Plan2Gather.Services
+@using Plan2Gather.Models
+@using System.Security.Cryptography.Xml
 @inject NavigationManager Nav
 @inject JwtAuthStateProvider AuthState
 @inject ApiHttpClientFactory ApiFactory
@@ -37,17 +41,8 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email (optional)</label>
+                        <label for="email" class="form-label">Email (optional - required to create events)</label>
                         <input type="email" id="email" class="form-control" @bind="_email" @bind:event="oninput" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="accType" class="form-label">Account Type</label>
-                        <select id="accType" class="form-select" @bind="_accountType" @bind:event="onchange" required>
-                            <option value="" disabled selected>Select...</option>
-                            <option value="FULL">Organizer</option>
-                            <option value="BASIC">User</option>
-                        </select>
                     </div>
 
                     <button type="submit" class="btn btn-orange w-100">Register</button>
@@ -66,7 +61,7 @@
     private string _password = "";
     private string _confirmPassword = "";
     private string _email = "";
-    private string _accountType = "";
+    private User.UserTypes _accountType = User.UserTypes.NONE;
     private string _error = "";
 
     private async Task HandleRegister()
@@ -89,17 +84,15 @@
             _error = "Passwords do not match.";
             return;
         }
-        if (string.IsNullOrWhiteSpace(_accountType))
-        {
-            _error = "Please select an account type.";
-            return;
-        }
+        if (!string.IsNullOrWhiteSpace(_email)) _accountType = User.UserTypes.FULL;
+        else _accountType = User.UserTypes.BASIC;
 
         try
         {
             var client = ApiFactory.Create();
-            var payload = new RegisterRequest(_username, _password, _confirmPassword, _accountType,
-                                              string.IsNullOrWhiteSpace(_email) ? null : _email);
+            var payload = new RegisterRequest(
+                _username, _password, _confirmPassword, 
+                _accountType, string.IsNullOrWhiteSpace(_email) ? null : _email);
             var response = await client.PostAsJsonAsync("/api/auth/register", payload);
 
             if (response.IsSuccessStatusCode)

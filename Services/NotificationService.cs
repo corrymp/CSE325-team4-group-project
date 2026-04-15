@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CSE325_team4_group_project.Models;
+using Plan2Gather.Models;
 
-namespace CSE325_team4_group_project.Services
+namespace Plan2Gather.Services
 {
     public class NotificationService
     {

@@ -1,4 +1,9 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using Plan2Gather.Components.Notifications
+@using Plan2Gather.Auth
+@rendermode InteractiveServer
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject JwtAuthStateProvider AuthState
 @inject NavigationManager Navigation
 
 <!-- Blue header -->
@@ -8,38 +13,21 @@
             <div class="site-title">
                 <a href="/" class="text-white text-decoration-none fs-3 fw-bold">Plan2<span>Gather</span></a>
             </div>
+            <Notifications />
             <nav class="auth-buttons">
-                @if (User?.Identity?.IsAuthenticated == true){
-                    <a href="/account"><span class="text-white me-3">Hello, @User.Identity.Name!</span></a>
-                    <button @onclick="Logout" class="btn btn-warning btn-sm">Logout</button>
-                }else{
-                    <a href="/register" class="btn btn-warning btn-sm me-2">Register</a>
-                    <a href="/login" class="btn btn-warning btn-sm">Log in</a>
-                }
+                <AuthorizeView>
+                    <Authorized>
+                        <a href="/account"><span class="text-white me-3">Hello, @context.User.Identity?.Name!</span></a>
+                        <button @onclick="Logout" class="btn btn-warning btn-sm">Log out</button>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a href="/register" class="btn btn-warning btn-sm me-2">Create Account</a>
+                        <a href="/login" class="btn btn-warning btn-sm">Log in</a>
+                    </NotAuthorized>
+                </AuthorizeView>
             </nav>
         </div>
     </div>
-@* @using Microsoft.AspNetCore.Components.Authorization
-@using Plan2Gather.Auth
-@inject JwtAuthStateProvider AuthState
-@inject NavigationManager Nav
-@rendermode InteractiveServer
-
-<header class="header">
-    <a href="/" class="logo"><span class="logo-text">Plan2<span>Gather</span></span></a>
-    <nav class="header-nav">
-        <Notifications />
-        <AuthorizeView>
-            <Authorized>
-                <a href="/account">Hello, @context.User.Identity?.Name</a>
-                <button class="btn btn-primary" @onclick="Logout">Log out</button>
-            </Authorized>
-            <NotAuthorized>
-                <a href="/login" class="btn btn-primary">Log in</a>
-                <a href="/register" class="btn btn-primary">Create Account</a>
-            </NotAuthorized>
-        </AuthorizeView>
-    </nav>
 </header>
 
 @code {
@@ -53,47 +41,7 @@
 
     private async Task Logout()
     {
+        await AuthState.ClearTokenAsync();
         Navigation.NavigateTo("/logout", true);
-    }
-}
-
-    private async Task Logout()
-    {
-        await AuthState.ClearTokenAsync();
-        Nav.NavigateTo("/");
-    }
-} *@
-@using Microsoft.AspNetCore.Components.Authorization
-@using Plan2Gather.Auth
-@inject JwtAuthStateProvider AuthState
-@inject IJSRuntime JS
-
-<div class="blue-header">
-    <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center py-2">
-            <div class="site-title">
-                <a href="/" class="text-white text-decoration-none fs-3 fw-bold">Plan2Gather</a>
-            </div>
-            <div class="auth-buttons">
-                <AuthorizeView>
-                    <Authorized>
-                        <span class="text-white me-3">Hello, @context.User.Identity?.Name!</span>
-                        <button @onclick="Logout" class="btn btn-warning btn-sm">Logout</button>
-                    </Authorized>
-                    <NotAuthorized>
-                        <a href="/register" class="btn btn-warning btn-sm me-2">Register</a>
-                        <a href="/login" class="btn btn-warning btn-sm">Login</a>
-                    </NotAuthorized>
-                </AuthorizeView>
-            </div>
-        </div>
-    </div>
-</div>
-
-@code {
-    private async Task Logout()
-    {
-        await AuthState.ClearTokenAsync();
-        await JS.InvokeVoidAsync("window.location.assign", "/");
     }
 }

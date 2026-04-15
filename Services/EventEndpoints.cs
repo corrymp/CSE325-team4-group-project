@@ -44,7 +44,7 @@ public static class EventEndpoints
             EventName = req.Name,
             EventDescription = req.Description ?? "",
             StartTime = DateTime.UtcNow,
-            Duration = 0,
+            Dates = "",
             AllowGuests = req.AllowGuestAccounts
         };
 
