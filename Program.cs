@@ -11,8 +11,13 @@ using Plan2Gather.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents(options =>
+    {
+        options.DetailedErrors = true;  // ENABLE DETAILED ERRORS
+    });
 builder.Services.AddRazorPages();
+builder.Services.AddHttpContextAccessor();
 
 // DATABASE
 builder.Services.AddDbContextFactory<Plan2GatherContext>(opts => opts.UseSqlite(builder.Configuration.GetConnectionString("Plan2GatherContext") ?? throw new NullReferenceException("Missing connection string")));
@@ -50,7 +55,7 @@ builder.Services.AddScoped<JwtAuthStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<JwtAuthStateProvider>());
 
 // HttpClient for Blazor components calling local API endpoints
-builder.Services.AddHttpClient("API", client =>{});
+builder.Services.AddHttpClient("API", client => { });
 
 // Notification service (in-memory for demo)
 builder.Services.AddSingleton<NotificationService>();
@@ -82,6 +87,7 @@ app.UseAuthorization();
 app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapAuthEndpoints();
+app.MapEventEndpoints();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 app.MapRazorPages().WithStaticAssets();
 app.Run();

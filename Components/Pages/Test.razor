@@ -1,0 +1,11 @@
+@page "/test"
+
+<div class="container mt-5">
+    <h2>Blazor Interactivity Test</h2>
+    <button class="btn btn-primary" @onclick="() => count++">Click me</button>
+    <p>Button clicked: @count times</p>
+</div>
+
+@code {
+    private int count = 0;
+}
