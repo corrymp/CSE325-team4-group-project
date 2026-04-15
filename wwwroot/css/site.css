@@ -49,6 +49,13 @@ body {
     border-color: #0d6efd;
 }
 
+.form-control-plaintext {
+    color: white;
+    background-color: #121212;
+    border-radius: 5px;
+    padding: 5px;
+}
+
 .alert-danger {
     background-color: #442a2a;
     color: #ffb4b4;
