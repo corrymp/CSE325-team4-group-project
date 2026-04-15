@@ -1,0 +1,5 @@
+@page "/testevent/{EventId:int}"
+@rendermode InteractiveServer
+<h1>Test Event Page</h1>
+<p>Event ID: @EventId</p>
+@code { [Parameter] public int EventId { get; set; } }

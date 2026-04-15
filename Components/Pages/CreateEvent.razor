@@ -4,8 +4,10 @@
 @using System.Text
 @using System.Text.Json
 @using Plan2Gather.Services
+@using Plan2Gather.Auth
 @inject NavigationManager Nav
 @inject ApiHttpClientFactory ApiFactory
+@inject JwtAuthStateProvider AuthState
 
 <PageTitle>Create Event</PageTitle>
 
@@ -126,6 +128,13 @@
 
         try
         {
+            var token = await AuthState.GetTokenAsync();
+            if (string.IsNullOrEmpty(token))
+            {
+                _error = "You are not logged in. Please log in again.";
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(_eventName))
             {
                 _error = "Event name is required.";
@@ -161,7 +170,7 @@
             };
 
             var client = ApiFactory.Create();
-            // Explicitly set content type to JSON
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
             var response = await client.PostAsync("/api/events/", content);
 
@@ -170,7 +179,7 @@
                 var json = await response.Content.ReadAsStringAsync();
                 using var doc = JsonDocument.Parse(json);
                 int eventId = doc.RootElement.GetProperty("eventId").GetInt32();
-                Nav.NavigateTo($"/event/{eventId}");
+                Nav.NavigateTo($"/event/{eventId}", true);
             }
             else
             {

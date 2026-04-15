@@ -110,3 +110,13 @@ button.accept-policy {
     white-space: nowrap;
     line-height: 60px;
 }
+#availabilityMatrix td, #availabilityMatrix th {
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    vertical-align: middle;
+    user-select: none;
+}
+#availabilityMatrix td {
+    cursor: crosshair;
+}

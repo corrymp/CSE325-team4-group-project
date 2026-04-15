@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Plan2Gather.Data;
@@ -13,8 +14,9 @@ public static class EventEndpoints
     {
         var group = app.MapGroup("/api/events").RequireAuthorization();
 
-        // DISABLE ANTIFORGERY for the create endpoint
-        group.MapPost("/", CreateEvent).DisableAntiforgery();
+        group.MapPost("/", CreateEvent)
+            .DisableAntiforgery()
+            .Accepts<CreateEventRequest>("application/json");
         group.MapGet("/{eventId}", GetEvent);
         group.MapPost("/{eventId}/attendance", SetAvailability);
         group.MapGet("/{eventId}/attendances", GetAttendances);
@@ -26,8 +28,7 @@ public static class EventEndpoints
 
     private static async Task<IResult> CreateEvent(
         HttpContext http,
-        Plan2GatherContext db,
-        [FromBody] CreateEventRequest req)
+        Plan2GatherContext db)
     {
         var userIdClaim = http.User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userIdClaim == null) return Results.Unauthorized();
@@ -37,6 +38,17 @@ public static class EventEndpoints
 
         var user = await db.Users.FindAsync(organizerId);
         if (user == null) return Results.Unauthorized();
+
+        CreateEventRequest? req;
+        try
+        {
+            req = await http.Request.ReadFromJsonAsync<CreateEventRequest>();
+            if (req == null) return Results.BadRequest("Invalid JSON body.");
+        }
+        catch (Exception ex)
+        {
+            return Results.BadRequest($"Error reading JSON: {ex.Message}");
+        }
 
         var eventEntity = new Event
         {
@@ -51,16 +63,24 @@ public static class EventEndpoints
         db.Events.Add(eventEntity);
         await db.SaveChangesAsync();
 
+        // Create 30-minute slots for each requested day+range
         foreach (var slotReq in req.TimeSlots)
         {
-            var slot = new EventTimeSlot
+            var start = TimeOnly.Parse(slotReq.StartTime);
+            var end = TimeOnly.Parse(slotReq.EndTime);
+            var current = start;
+            while (current < end)
             {
-                EventId = eventEntity.EventId,
-                DayOfWeek = slotReq.DayOfWeek,
-                StartTime = TimeOnly.Parse(slotReq.StartTime),
-                EndTime = TimeOnly.Parse(slotReq.EndTime)
-            };
-            db.EventTimeSlots.Add(slot);
+                var slot = new EventTimeSlot
+                {
+                    EventId = eventEntity.EventId,
+                    DayOfWeek = slotReq.DayOfWeek,
+                    StartTime = current,
+                    EndTime = current.AddMinutes(30)
+                };
+                db.EventTimeSlots.Add(slot);
+                current = current.AddMinutes(30);
+            }
         }
         await db.SaveChangesAsync();
 
@@ -72,9 +92,7 @@ public static class EventEndpoints
         Plan2GatherContext db,
         HttpContext http)
     {
-        var ev = await db.Events
-            .FirstOrDefaultAsync(e => e.EventId == eventId);
-
+        var ev = await db.Events.FirstOrDefaultAsync(e => e.EventId == eventId);
         if (ev == null) return Results.NotFound();
 
         var userIdClaim = http.User.FindFirstValue(ClaimTypes.NameIdentifier);

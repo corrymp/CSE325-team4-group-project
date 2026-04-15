@@ -42,4 +42,18 @@ public class JwtAuthStateProvider(IJSRuntime js, JwtService jwtService) : Authen
         await js.InvokeVoidAsync("localStorage.removeItem", TokenKey);
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
+
+    // ✅ Add this method to retrieve the token
+    public async Task<string?> GetTokenAsync()
+    {
+        try
+        {
+            return await js.InvokeAsync<string?>("localStorage.getItem", TokenKey);
+        }
+        catch
+        {
+            // JS not available (prerendering)
+            return null;
+        }
+    }
 }
