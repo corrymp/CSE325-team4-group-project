@@ -1,0 +1,40 @@
+
+<table class="grid">
+    <thead>
+        <tr>
+            <td></td>
+            <th>Jan 01<span>Sun</span></th>
+            <th>Jan 02<span>Mon</span></th>
+            <th>Jan 03<span>Tue</span></th>
+            <th>Jan 04<span>Wed</span></th>
+            <th>Jan 05<span>Thu</span></th>
+            <th>Jan 06<span>Fri</span></th>
+            <th>Jan 07<span>Sat</span></th>
+        </tr>
+    </thead>
+    <tbody>
+        @for(int idx=0, hour=9;idx<8*4;idx++){
+            <tr>
+                @if(idx%4==0){
+                    <th>@hour:00@(hour>12?"P":"A")M</th>
+                    hour++;
+                }else{
+                    <th></th>
+                }
+                @for(var j=0;j<7;j++){
+                    <td class="set@(highlightable?"All":"")Events"></td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+<script>
+    load(@(highlightable?
+    @:"interact"
+    :
+    @:"hover"
+    ))
+</script>
+@code{
+    [Parameter] public bool highlightable {get;set;} = false;
+}

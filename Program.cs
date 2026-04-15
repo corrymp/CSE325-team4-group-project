@@ -53,6 +53,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<JwtAuthStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<JwtAuthStateProvider>());
+builder.Services.AddCascadingAuthenticationState();
 
 // HttpClient for Blazor components calling local API endpoints
 builder.Services.AddHttpClient("API", client => { });

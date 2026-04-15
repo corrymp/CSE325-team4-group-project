@@ -1,0 +1,175 @@
+/* #region generic */
+.b{border:1px solid #000}
+.b0{border:0}
+.br{border-right: 1px solid #000}
+.bl{border-left: 1px solid #000}
+.bt{border-top: 1px solid #000}
+.bb{border-bottom: 1px solid #000}
+.brw{border-right-color: #fff}
+.blw{border-left-color: #fff}
+.btw{border-top-color: #fff}
+.bbw{border-bottom-color: #fff}
+.btd{border-top-style: dotted}
+
+.m0{margin:0}
+.mt1{margin-top:1px}
+.mb8{margin-bottom:8px}
+.mb7{margin-bottom:7px}
+.ml40{margin-left:40px}
+.m4400{margin:4px 4px 0px 0px}
+
+.p0{padding:0}
+.p5{padding:5px}
+.p05{padding:0 5px}
+.pr1{padding-right:1px}
+
+.bg-e{background:#ffdede}
+.bg-w{background: #fff}
+.bg-b{background: #000;}
+
+.avg{vertical-align:top;font-size:0px}
+.ss{width:44px;height:9px}
+.dibz{display:inline-block;zoom:1}
+.di{display:inline}
+.vabtar{vertical-align:bottom;text-align:right}
+.vam{vertical-align:middle}
+.fs0vat {font-size: 0px;vertical-align: top;}
+
+.fs10{font-size:10px}
+.fs12{font-size:12px}
+.fs16{font-size:16px}
+
+.tar{text-align:right}
+.tac{text-align:center}
+
+.w150{width:150px}
+
+.none{display:none}
+.flex{display:flex}
+.center{display: flex;justify-content: center;}
+/* #endregion  */
+/* *|*{outline: 1px solid red;outline-offset: -1px} */
+#form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    justify-items: center;
+
+    #nameBox{
+        grid-column: 1/-1;
+        text-align: center;
+        width:100%;
+        margin:20px 0 20px 0;
+        input{
+            font-size:22px;
+            text-align: center
+        }
+    }
+
+    #dates,
+    #times,
+    #meta{
+        background-color: #333;
+        border: 2px outset;
+        border-radius: 1em;
+        text-align: center;
+        width: 50%;
+        min-width:305px;
+        line-height:1.5
+    }
+    #dates{grid-row: 2/-1;}
+    #times {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    #dates>div:first-of-type {margin: 10px 0px 10px 0px}
+    #meta {
+        display:flex;flex-direction:column;gap:10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        #descriptionBox{
+            display:flex;flex-direction: column;
+            #description{
+                height: 100%;
+                width: 90%;
+                margin: auto;
+            }
+        }
+        #submitBox {
+            margin: auto auto 5px auto;
+            font-size: 16px;
+            button{
+                font-size: 12px;
+            }
+        }
+    }
+}
+
+#calendar{
+    font-size:14px;
+    margin: 0px auto 0px auto;
+    width: 305px;
+
+    .today{font-weight: bold;}
+
+    thead{
+        tr{
+            td,th{
+                width:17px; 
+                padding: 0px 3px 0px 3px; 
+                margin:1px;
+                line-height: 1.0; 
+                vertical-align:middle; 
+                text-align:center;
+                cursor: move
+            }
+            td{
+                width: 90px;
+            }
+        }
+    }
+    tbody {
+        tr{
+            th,td{
+                height: 17px;
+            }
+            th{
+                width:60px; 
+                vertical-align:baseline; 
+                cursor: move;
+            }
+            th:first-of-type{
+                padding: 4px 5px 4px 0px;
+                text-align: right; 
+            }
+            td{
+                line-height: 1.0; 
+                width:17px; 
+                vertical-align:middle;
+                border:solid 1px black; 
+                color: #000;
+                padding: 2px;
+                margin:1px;
+                text-align:center; 
+                background-color:#ffdede;
+                cursor: pointer;
+                span{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                
+            }
+            th:last-of-type{
+                padding:1px; 
+                padding: 4px 0px 4px 5px;
+                text-align: left; 
+            }
+        }
+    }
+}
+
+#jumpToDate{margin:5px; height:20px;}

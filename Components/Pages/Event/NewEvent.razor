@@ -1,0 +1,139 @@
+@page "/new"
+@using Humanizer
+@using Microsoft.EntityFrameworkCore
+@using Plan2Gather.Models
+@inject IDbContextFactory<Plan2Gather.Data.Plan2GatherContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>New Event</PageTitle>
+
+<HeadContent>
+    <link rel="stylesheet" href="@Assets["css/newEvent.css"]" />
+    <script src="@Assets["js/newEvent.js"]" defer></script>
+</HeadContent>
+
+<form method="post" id="form">
+    <div id="nameBox"><InputText id="name" @bind-Value="eventName" /></div>
+    <div id="dates">
+        <p>What dates might work?</p>
+        <p>Click and drag dates to choose possibilities.</p>
+        <p>Click and drag labels to shift the calendar.</p>
+
+        <table id="calendar" data-loaded="@today.ToString("yyyy-MM-dd")" data-sunday="@sunday.ToString("yyyy-MM-dd")">
+            <thead>
+                <tr>
+                    <td></td>
+                    <th class="cal-week">S</th>
+                    <th class="cal-week">M</th>
+                    <th class="cal-week">T</th>
+                    <th class="cal-week">W</th>
+                    <th class="cal-week">T</th>
+                    <th class="cal-week">F</th>
+                    <th class="cal-week">S</th>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody>
+            @{
+                var current = sunday.Date;
+                for(var i=1;i<=5;i++){
+                    string monthName = current.ToString("MMM");
+                    string endOfWeekMonthName = current.AddDays(6).ToString("MMM");
+                    if(monthName != endOfWeekMonthName) monthName = $"{monthName}/{endOfWeekMonthName}";
+                    <tr id="row-@i" class="cal-row">
+                        <th id="month-@i" class="dateSide">@monthName</th>
+                        @for(var j=1;j<=7;j++){
+                            <td 
+                                id="day-@i-@j" 
+                                data-row="@i" 
+                                data-col="@j" 
+                                class="dateBox@(
+                                current.Day==today.Day&&
+                                current.Month==today.Month&&
+                                current.Year==today.Year
+                               ?" today":"")"
+                            >
+                                <span>@current.Day</span>
+                            </td>
+                            <input type="hidden" id="dateOf-@i-@j" value="@current.ToString("yyyy-MM-dd")" />
+                            current = current.AddDays(1);
+                        }
+                        <th id="year-@i" class="dateSide">@current.Year</th>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+        <div id="jumpToDate">
+            <button type="button">Today</button>
+        </div>
+    </div>
+
+    <div id="times">
+        <p>What times might work?</p>
+
+        <div>
+            No earlier than:
+            <select name="rangeStart" id="rangeStart">
+            @for(var i=0;i<24;i++){
+                <option value="@i" selected="@(i==9)">
+                    @(i==0?"12":i>12?i-12:i):00 @(i<12?"AM":"PM")
+                </option>
+            }
+            </select>
+        </div>
+
+        <div>
+            No later than:
+            <select name="rangeEnd" id="rangeEnd">
+            @for(var i=0;i<24;i++){
+                <option value="@i" selected="@(i==17)">
+                    @(i==0?"12":i>12?i-12:i):00 @(i<12?"AM":"PM")
+                </option>
+            }
+            </select>
+
+        </div>
+        
+        <div>
+            Time Zone:
+            <select name="timezone" id="timezone">
+                @foreach(var tz in NodaTime.DateTimeZoneProviders.Tzdb.Ids
+                ){
+                    <option value="@tz" selected="@(tz=="America/Los_Angeles")">@tz</option>
+                }
+            </select>
+
+        </div>
+        
+    </div>
+
+    <div id="meta">
+
+        <div id="descriptionBox">
+            <label for="description">Event description:</label>
+            <InputTextArea @bind-Value="description" name="description" id="description"/>
+        </div>
+
+        <div id="allowGuestsBox">
+            <label for="allowGuests">Allow guests accounts?</label>
+            <InputCheckbox @bind-Value="allowGuests" name="allowGuests" id="allowGuests" />
+        </div>
+
+        <div id="submitBox">
+            <input type="hidden" name="possibleDates" id="possibleDates">
+            Ready? <button type="submit">Create Event</button>
+        </div>
+
+    </div>
+</form>
+
+@code {
+    private Event evnt {get; set;} = default!;
+    private DateTime today = DateTime.Now.AtNoon();
+    private DateTime sunday=>today.AddDays(-(int)today.DayOfWeek);
+    private bool allowGuests = true;
+    private string eventName = "New Event Name";
+    private DateTime startTime = DateTime.Now;
+    private string description = string.Empty;
+}

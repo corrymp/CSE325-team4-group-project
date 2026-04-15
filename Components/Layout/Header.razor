@@ -1,3 +1,24 @@
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+
+<!-- Blue header -->
+<header class="blue-header">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center py-2">
+            <div class="site-title">
+                <a href="/" class="text-white text-decoration-none fs-3 fw-bold">Plan2<span>Gather</span></a>
+            </div>
+            <nav class="auth-buttons">
+                @if (User?.Identity?.IsAuthenticated == true){
+                    <a href="/account"><span class="text-white me-3">Hello, @User.Identity.Name!</span></a>
+                    <button @onclick="Logout" class="btn btn-warning btn-sm">Logout</button>
+                }else{
+                    <a href="/register" class="btn btn-warning btn-sm me-2">Register</a>
+                    <a href="/login" class="btn btn-warning btn-sm">Log in</a>
+                }
+            </nav>
+        </div>
+    </div>
 @* @using Microsoft.AspNetCore.Components.Authorization
 @using Plan2Gather.Auth
 @inject JwtAuthStateProvider AuthState
@@ -22,6 +43,20 @@
 </header>
 
 @code {
+    private System.Security.Claims.ClaimsPrincipal? User { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        User = authState.User;
+    }
+
+    private async Task Logout()
+    {
+        Navigation.NavigateTo("/logout", true);
+    }
+}
+
     private async Task Logout()
     {
         await AuthState.ClearTokenAsync();

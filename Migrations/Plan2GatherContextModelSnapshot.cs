@@ -43,8 +43,9 @@ namespace Plan2Gather.Migrations
                     b.Property<bool>("AllowGuests")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Duration")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Dates")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("EventDescription")
                         .IsRequired()
