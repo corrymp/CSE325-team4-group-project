@@ -11,7 +11,7 @@ using Plan2Gather.Data;
 namespace Plan2Gather.Migrations
 {
     [DbContext(typeof(Plan2GatherContext))]
-    [Migration("20260409052956_InitialCreate")]
+    [Migration("20260415033655_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -46,8 +46,9 @@ namespace Plan2Gather.Migrations
                     b.Property<bool>("AllowGuests")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Duration")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Dates")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("EventDescription")
                         .IsRequired()

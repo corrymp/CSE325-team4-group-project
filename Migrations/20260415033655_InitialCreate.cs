@@ -34,7 +34,7 @@ namespace Plan2Gather.Migrations
                     EventName = table.Column<string>(type: "TEXT", maxLength: 48, nullable: false),
                     EventDescription = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
                     StartTime = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Duration = table.Column<int>(type: "INTEGER", nullable: false),
+                    Dates = table.Column<string>(type: "TEXT", nullable: false),
                     AllowGuests = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>

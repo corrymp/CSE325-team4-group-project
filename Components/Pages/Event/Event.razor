@@ -1,0 +1,78 @@
+@page "/e"
+@using Microsoft.EntityFrameworkCore
+@using Plan2Gather.Models
+@using Plan2Gather.Data
+@inject IDbContextFactory<Plan2Gather.Data.Plan2GatherContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>@if(evnt is null){@("Loading")}else{@evnt.EventName}</PageTitle>
+
+<link rel="stylesheet" href="css/Event.css">
+<script src="@Assets["js/Event.js"]"></script>
+
+<div id="availability">
+    <div class="top">
+        <h1>
+            @if(evnt is null) {
+                @: Loading...
+            }else{
+                @evnt.EventName
+            }
+        </h1>
+    </div>
+
+    <div class="left">
+        <div id="availabilityList">
+            <hgroup>
+                <h2>Available</h2>
+                <p id="av-date"></p>
+            </hgroup>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Available</th>
+                        <th>Unavailable</th>
+                    </tr>
+                </thead>
+                <tbody id="av-list">
+
+                </tbody>
+            </table>
+
+        </div>
+        <div>
+            <h2>Your Availability</h2>
+            @if(evnt is null){
+                <DummyGrid />
+            }else{
+                <AvailabilityGrid highlightable />
+            }
+        </div>
+    </div>
+
+    <div class="right">
+        <div>
+            <h2>Group's Availability</h2>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio vel quaerat minus amet provident. Tempora minus, accusantium optio assumenda ullam nam vitae nisi quas illo nemo hic nihil, non alias.</p>
+        </div>
+
+        @if(evnt is null){
+            <DummyGrid />
+        }else{
+            <AvailabilityGrid />
+        }
+    </div>
+</div>
+
+@code{
+    [SupplyParameterFromQuery] private int id {get; set;}
+
+    private Plan2Gather.Models.Event? evnt;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        evnt = await context.Events.FirstOrDefaultAsync(e => e.EventId == id);
+        if(evnt is null) NavigationManager.NotFound();
+    }
+}

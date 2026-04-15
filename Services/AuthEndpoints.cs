@@ -17,6 +17,10 @@ public static class AuthEndpoints
 
     private static async Task<IResult> Register(RegisterRequest req, Plan2GatherContext db, JwtService jwt)
     {
+        Console.WriteLine(
+            "Name: '{0}'\nPass: '{1}'\nConf: '{2}'\nMail: '{3}'\nType: '{4}'",
+            req.UserName,req.Password,req.ConfirmPassword,req.Email,req.AccountType
+        );
         // --- Validation ---
         if (string.IsNullOrWhiteSpace(req.UserName) || req.UserName.Length < 1 || req.UserName.Length > 16)
             return Results.BadRequest("Username must be 1–16 characters.");
@@ -45,9 +49,9 @@ public static class AuthEndpoints
                 return Results.BadRequest("Username is already taken.");
         }
 
-        User.UserTypes userType;
+        User.UserTypes userType = req.AccountType;
 
-        if (!Enum.TryParse<User.UserTypes>(req.AccountType, true, out userType))
+        if (userType == User.UserTypes.NONE)
         {
             return Results.BadRequest("Invalid account type.");
         }
@@ -98,6 +102,6 @@ public static class AuthEndpoints
 }
 
 // --- DTOs ---
-public record RegisterRequest(string UserName, string Password, string ConfirmPassword, string AccountType, string? Email);
+public record RegisterRequest(string UserName, string Password, string ConfirmPassword, User.UserTypes AccountType, string? Email);
 public record LoginRequest(string UserName, string Password);
 public record AuthResponse(string Token, string UserName, string UserType);
