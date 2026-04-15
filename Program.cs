@@ -1,10 +1,14 @@
 using CSE325_team4_group_project.Components;
+using CSE325_team4_group_project.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+// Notification service (in-memory for demo)
+builder.Services.AddSingleton<NotificationService>();
 
 var app = builder.Build();
 

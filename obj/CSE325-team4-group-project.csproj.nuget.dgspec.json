@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Owner\\Desktop\\CSE325-team4-group-project\\CSE325-team4-group-project.csproj": {}
+    "c:\\Users\\Owner\\Desktop\\CSE325-team4-group-project\\CSE325-team4-group-project.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Owner\\Desktop\\CSE325-team4-group-project\\CSE325-team4-group-project.csproj": {
+    "c:\\Users\\Owner\\Desktop\\CSE325-team4-group-project\\CSE325-team4-group-project.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Owner\\Desktop\\CSE325-team4-group-project\\CSE325-team4-group-project.csproj",
+        "projectUniqueName": "c:\\Users\\Owner\\Desktop\\CSE325-team4-group-project\\CSE325-team4-group-project.csproj",
         "projectName": "CSE325-team4-group-project",
-        "projectPath": "C:\\Users\\Owner\\Desktop\\CSE325-team4-group-project\\CSE325-team4-group-project.csproj",
+        "projectPath": "c:\\Users\\Owner\\Desktop\\CSE325-team4-group-project\\CSE325-team4-group-project.csproj",
         "packagesPath": "C:\\Users\\Owner\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Owner\\Desktop\\CSE325-team4-group-project\\obj\\",
+        "outputPath": "c:\\Users\\Owner\\Desktop\\CSE325-team4-group-project\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Owner\\AppData\\Roaming\\NuGet\\NuGet.Config"

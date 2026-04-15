@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "P3Cf5FLYwPc=",
+  "dgSpecHash": "H1gsEkmDeVA=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Owner\\Desktop\\CSE325-team4-group-project\\CSE325-team4-group-project.csproj",
+  "projectFilePath": "c:\\Users\\Owner\\Desktop\\CSE325-team4-group-project\\CSE325-team4-group-project.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Owner\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.4\\microsoft.aspnetcore.app.internal.assets.10.0.4.nupkg.sha512"
   ],
