@@ -136,7 +136,7 @@
                 if (result is not null)
                 {
                     await AuthState.SetTokenAsync(result.Token);
-                    Nav.NavigateTo("/");
+                    Nav.NavigateTo("/", true);
                 }
             }
             else

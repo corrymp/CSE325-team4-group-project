@@ -1,7 +1,9 @@
 @page "/event/{EventId:int}"
+@rendermode InteractiveServer
 @using System.Net.Http.Json
+@using System.Net.Http.Headers
 @using System.Security.Claims
-@using Plan2Gather.Auth             
+@using Plan2Gather.Auth
 @using Plan2Gather.Services
 @inject NavigationManager Nav
 @inject ApiHttpClientFactory ApiFactory
@@ -9,6 +11,42 @@
 @inject IJSRuntime JS
 
 <PageTitle>@_eventName | Plan2Gather</PageTitle>
+
+<style>
+    .matrices-container {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    .matrix-wrapper {
+        flex: 1;
+        min-width: 300px;
+    }
+    .availability-matrix {
+        width: auto;
+        margin-left: 0;
+        font-size: 12px;
+        border-collapse: collapse;
+    }
+    .availability-matrix td, .availability-matrix th {
+        width: 40px;
+        height: 40px;
+        text-align: center;
+        vertical-align: middle;
+        padding: 2px;
+        user-select: none;
+        border: 1px solid #dee2e6;
+    }
+    .availability-matrix td {
+        cursor: pointer;
+    }
+    .readonly-matrix td {
+        cursor: default;
+    }
+    h4 {
+        margin-top: 0;
+    }
+</style>
 
 @if (_loading)
 {
@@ -28,63 +66,182 @@ else
             </div>
         }
 
-        <h4>Availability Matrix</h4>
-        <div style="overflow-x: auto;">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        @foreach (var slot in _timeSlots)
-                        {
-                            <th>@slot.DayOfWeek<br />@slot.StartTime - @slot.EndTime</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var user in _attendancesByUser)
-                    {
-                        <tr>
-                            <td>@user.UserName</td>
-                            @foreach (var slot in _timeSlots)
+        <div class="matrices-container">
+            <!-- Left: user's own availability matrix -->
+            <div class="matrix-wrapper">
+                <h4>Your Availability (click to toggle)</h4>
+                <div style="overflow-x: auto;">
+                    <table class="availability-matrix" id="userAvailabilityMatrix">
+                        <thead>
+                            <tr>
+                                <th>Time / Day</th>
+                                @foreach (var day in _days)
+                                {
+                                    <th>@day.Key.ToString()</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var hour in _hours)
                             {
-                                var isAvail = user.AvailableSlotIds.Contains(slot.Id);
-                                <td style="background-color: @(isAvail ? "#90EE90" : "#FFCCCC"); cursor: pointer;"
-                                    @onclick="() => ToggleAvailability(user.UserId, slot.Id)">
-                                    @(isAvail ? "✓" : "✗")
-                                </td>
+                                <tr>
+                                    <th>@hour</th>
+                                    @foreach (var day in _days)
+                                    {
+                                        if (_slotMap.ContainsKey(day.Key) && _slotMap[day.Key].ContainsKey(hour))
+                                        {
+                                            var slot = _slotMap[day.Key][hour];
+                                            var isSelected = _currentUserAvailabilities.Contains(slot.Id);
+                                            <td style="background-color: @(isSelected ? "#90EE90" : "#FFCCCC")"
+                                                title="@GetUsersForSlot(slot.Id)"
+                                                @onclick="() => ToggleSlot(slot.Id)">
+                                                &nbsp;
+                                             </td>
+                                        }
+                                        else
+                                        {
+                                            <td style="background-color: #f0f0f0;">&nbsp;</td>
+                                        }
+                                    }
+                                 </tr>
                             }
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Right: collective availability matrix -->
+            <div class="matrix-wrapper">
+                <h4>Overall Availability (hover to see who is available)</h4>
+                <div style="overflow-x: auto;">
+                    <table class="availability-matrix readonly-matrix" id="collectiveAvailabilityMatrix">
+                        <thead>
+                            <tr>
+                                <th>Time / Day</th>
+                                @foreach (var day in _days)
+                                {
+                                    <th>@day.Key.ToString()</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var hour in _hours)
+                            {
+                                <tr>
+                                    <th>@hour</th>
+                                    @foreach (var day in _days)
+                                    {
+                                        if (_slotMap.ContainsKey(day.Key) && _slotMap[day.Key].ContainsKey(hour))
+                                        {
+                                            var slot = _slotMap[day.Key][hour];
+                                            var hasAnyUser = _slotUsers.ContainsKey(slot.Id) && _slotUsers[slot.Id].Count > 0;
+                                            var users = GetUsersForSlot(slot.Id);
+                                            <td style="background-color: @(hasAnyUser ? "#90EE90" : "#FFFFFF"); cursor: help;"
+                                                title="@users">
+                                                &nbsp;
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td style="background-color: #f0f0f0;">&nbsp;</td>
+                                        }
+                                    }
+                                 </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 }
+
+<script>
+    // Prevent horizontal scroll on wheel for both tables
+    document.querySelectorAll('.availability-matrix').forEach(table => {
+        table.addEventListener('wheel', (e) => {
+            if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+            if (e.deltaY !== 0 && !e.shiftKey) {
+                e.preventDefault();
+                window.scrollBy(0, e.deltaY);
+            }
+        }, { passive: false });
+    });
+</script>
 
 @code {
     [Parameter] public int EventId { get; set; }
 
     private string _eventName = "";
     private bool _isOrganizer = false;
-    private List<TimeSlotDto> _timeSlots = new();
+    private List<TimeSlotDto> _allSlots = new();
     private List<UserAttendanceDto> _attendancesByUser = new();
+    private List<int> _currentUserAvailabilities = new();
+    private int _currentUserId = 0;
     private bool _loading = true;
 
-    protected override async Task OnInitializedAsync()
+    private Dictionary<DayOfWeek, string> _days = new();
+    private List<string> _hours = new();
+    private Dictionary<DayOfWeek, Dictionary<string, TimeSlotDto>> _slotMap = new();
+    private Dictionary<int, List<string>> _slotUsers = new();
+
+    protected override async Task OnParametersSetAsync()
     {
+        _loading = true;
         await LoadEventData();
+        await LoadCurrentUserAvailability();
+        BuildMatrix();
+        BuildSlotUsersMap();
         _loading = false;
+        StateHasChanged();
+    }
+
+    private async Task ToggleSlot(int slotId)
+    {
+        Console.WriteLine($"Toggling slot {slotId}");
+        if (_currentUserAvailabilities.Contains(slotId))
+            _currentUserAvailabilities.Remove(slotId);
+        else
+            _currentUserAvailabilities.Add(slotId);
+        await SaveAvailability();
+        await LoadEventData();           // refresh attendances
+        BuildSlotUsersMap();             // rebuild tooltip map
+        StateHasChanged();
+    }
+
+    private string GetUsersForSlot(int slotId) =>
+        _slotUsers.TryGetValue(slotId, out var users) && users.Count > 0
+            ? string.Join(", ", users)
+            : "No one available";
+
+    private void BuildSlotUsersMap()
+    {
+        _slotUsers = new Dictionary<int, List<string>>();
+        foreach (var user in _attendancesByUser)
+        {
+            foreach (var slotId in user.AvailableSlotIds)
+            {
+                if (!_slotUsers.ContainsKey(slotId))
+                    _slotUsers[slotId] = new List<string>();
+                if (!_slotUsers[slotId].Contains(user.UserName))
+                    _slotUsers[slotId].Add(user.UserName);
+            }
+        }
     }
 
     private async Task LoadEventData()
     {
+        var token = await AuthState.GetTokenAsync();
+        if (string.IsNullOrEmpty(token)) return;
         var client = ApiFactory.Create();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
         var eventResp = await client.GetFromJsonAsync<EventDto>($"/api/events/{EventId}");
         if (eventResp != null)
         {
             _eventName = eventResp.Name;
             _isOrganizer = eventResp.IsOrganizer;
-            _timeSlots = eventResp.TimeSlots;
+            _allSlots = eventResp.TimeSlots;
         }
 
         var attendancesResp = await client.GetFromJsonAsync<List<UserAttendanceDto>>($"/api/events/{EventId}/attendances");
@@ -92,22 +249,35 @@ else
             _attendancesByUser = attendancesResp;
     }
 
-    private async Task ToggleAvailability(int userId, int slotId)
+    private async Task LoadCurrentUserAvailability()
     {
-        var currentUserId = await GetCurrentUserId();
-        if (userId != currentUserId) return;
+        _currentUserId = await GetCurrentUserId();
+        var userEntry = _attendancesByUser.FirstOrDefault(u => u.UserId == _currentUserId);
+        _currentUserAvailabilities = userEntry?.AvailableSlotIds.ToList() ?? new List<int>();
+    }
 
-        var userEntry = _attendancesByUser.FirstOrDefault(u => u.UserId == userId);
-        if (userEntry == null) return;
+    private void BuildMatrix()
+    {
+        _days = _allSlots
+            .GroupBy(s => s.DayOfWeek)
+            .ToDictionary(g => g.Key, g => g.Key.ToString());
 
-        if (userEntry.AvailableSlotIds.Contains(slotId))
-            userEntry.AvailableSlotIds.Remove(slotId);
-        else
-            userEntry.AvailableSlotIds.Add(slotId);
+        _hours = _allSlots
+            .Select(s => $"{s.StartTime}-{s.EndTime}")
+            .Distinct()
+            .OrderBy(h => h)
+            .ToList();
 
-        var client = ApiFactory.Create();
-        await client.PostAsJsonAsync($"/api/events/{EventId}/attendance", new { AvailableSlotIds = userEntry.AvailableSlotIds });
-        StateHasChanged();
+        _slotMap = new Dictionary<DayOfWeek, Dictionary<string, TimeSlotDto>>();
+        foreach (var day in _days.Keys)
+        {
+            _slotMap[day] = new Dictionary<string, TimeSlotDto>();
+            foreach (var slot in _allSlots.Where(s => s.DayOfWeek == day))
+            {
+                var hourKey = $"{slot.StartTime}-{slot.EndTime}";
+                _slotMap[day][hourKey] = slot;
+            }
+        }
     }
 
     private async Task<int> GetCurrentUserId()
@@ -117,6 +287,15 @@ else
         return userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
     }
 
+    private async Task SaveAvailability()
+    {
+        var token = await AuthState.GetTokenAsync();
+        if (string.IsNullOrEmpty(token)) return;
+        var client = ApiFactory.Create();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        await client.PostAsJsonAsync($"/api/events/{EventId}/attendance", new { AvailableSlotIds = _currentUserAvailabilities });
+    }
+
     private async Task CopyInviteLink()
     {
         await JS.InvokeVoidAsync("navigator.clipboard.writeText", Nav.BaseUri + $"event/{EventId}");
@@ -124,15 +303,25 @@ else
 
     private async Task ExportToSpreadsheet()
     {
+        var token = await AuthState.GetTokenAsync();
+        if (string.IsNullOrEmpty(token)) return;
         var client = ApiFactory.Create();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         await client.GetAsync($"/api/events/{EventId}/export");
     }
 
     private async Task AddDummyUser()
     {
+        var token = await AuthState.GetTokenAsync();
+        if (string.IsNullOrEmpty(token)) return;
         var client = ApiFactory.Create();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         await client.PostAsync($"/api/events/{EventId}/dummy-user", null);
         await LoadEventData();
+        await LoadCurrentUserAvailability();
+        BuildMatrix();
+        BuildSlotUsersMap();
+        StateHasChanged();
     }
 
     private record EventDto(string Name, bool IsOrganizer, List<TimeSlotDto> TimeSlots);

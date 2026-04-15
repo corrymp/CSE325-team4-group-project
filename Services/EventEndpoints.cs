@@ -13,7 +13,6 @@ public static class EventEndpoints
     {
         var group = app.MapGroup("/api/events").RequireAuthorization();
 
-        // DISABLE ANTIFORGERY for the create endpoint
         group.MapPost("/", CreateEvent).DisableAntiforgery();
         group.MapGet("/{eventId}", GetEvent);
         group.MapPost("/{eventId}/attendance", SetAvailability);
@@ -51,16 +50,24 @@ public static class EventEndpoints
         db.Events.Add(eventEntity);
         await db.SaveChangesAsync();
 
+        // Create 30‑minute slots for each requested day+range
         foreach (var slotReq in req.TimeSlots)
         {
-            var slot = new EventTimeSlot
+            var start = TimeOnly.Parse(slotReq.StartTime);
+            var end = TimeOnly.Parse(slotReq.EndTime);
+            var current = start;
+            while (current < end)
             {
-                EventId = eventEntity.EventId,
-                DayOfWeek = slotReq.DayOfWeek,
-                StartTime = TimeOnly.Parse(slotReq.StartTime),
-                EndTime = TimeOnly.Parse(slotReq.EndTime)
-            };
-            db.EventTimeSlots.Add(slot);
+                var slot = new EventTimeSlot
+                {
+                    EventId = eventEntity.EventId,
+                    DayOfWeek = slotReq.DayOfWeek,
+                    StartTime = current,
+                    EndTime = current.AddMinutes(30)
+                };
+                db.EventTimeSlots.Add(slot);
+                current = current.AddMinutes(30);
+            }
         }
         await db.SaveChangesAsync();
 
