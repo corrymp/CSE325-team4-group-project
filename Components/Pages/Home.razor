@@ -21,6 +21,19 @@
     </div>
 </section>
 
+@inject CSE325_team4_group_project.Services.NotificationService NotificationService
+
+<div class="m-3">
+    <button class="btn btn-outline-success" @onclick="SimulateInvite">Simulate Invite Notification</button>
+</div>
+
+@code {
+    private void SimulateInvite()
+    {
+        NotificationService.Add("Congratulations! You are invited to the meeting. I'll see you in 4 hours.");
+    }
+}
+
 <hr>
 
 <section>

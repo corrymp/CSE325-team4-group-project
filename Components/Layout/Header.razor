@@ -4,6 +4,7 @@
 <header class="header">
     <a href="/" class="logo"><span class="logo-text">Plan2<span>Gather</span></span></a>
     <nav class="header-nav">
+        <Notifications />
         @if (IsSignedIn){
             <a href="/account">Hello, @Name</a>
             <a href="/logout">Log out</a>

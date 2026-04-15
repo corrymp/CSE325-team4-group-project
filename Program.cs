@@ -52,6 +52,9 @@ builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredServ
 // HttpClient for Blazor components calling local API endpoints
 builder.Services.AddHttpClient("API", client =>{});
 
+// Notification service (in-memory for demo)
+builder.Services.AddSingleton<NotificationService>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope()) SeedData.Initialize(scope.ServiceProvider);
@@ -67,7 +70,12 @@ else
 }
 
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-app.UseHttpsRedirection();
+// Only enable HTTPS redirection when not in Development to avoid
+// the "Failed to determine the https port for redirect" warning during dev.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
