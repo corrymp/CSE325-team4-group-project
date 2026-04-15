@@ -1,9 +1,10 @@
 @page "/profile"
+@attribute [Authorize]
 @using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
 @using Plan2Gather.Auth
-@using Plan2Gather.Services
 @inject JwtAuthStateProvider AuthState
-@inject NavigationManager Nav
+@inject IJSRuntime JS
 @inject AuthenticationStateProvider AuthProvider
 
 <PageTitle>My Profile</PageTitle>
@@ -15,28 +16,18 @@
                 <h2 class="card-title text-center mb-4">My Profile</h2>
                 <hr />
 
-                @if (_user is not null)
-                {
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Username</label>
-                        <p class="form-control-plaintext">@_user.Identity?.Name</p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Email</label>
-                        <p class="form-control-plaintext">@_email</p>
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-danger" @onclick="Logout">Logout</button>
-                    </div>
-                    <div class="d-grid gap-2 mt-3">
-    <a href="/events/create" class="btn btn-primary">Create New Event</a>
-    <button class="btn btn-danger" @onclick="Logout">Logout</button>
-</div>
-                }
-                else
-                {
-                    <div class="alert alert-warning">You are not logged in. <a href="/login">Login here</a></div>
-                }
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Username:</label>
+                    <p class="form-control-plaintext">@_user?.Identity?.Name</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Email:</label>
+                    <p class="form-control-plaintext">@_email</p>
+                </div>
+                <div class="d-grid gap-2 mt-3">
+                    <a href="/event/create" class="btn btn-primary">Create New Event</a>
+                    <button class="btn btn-danger" @onclick="Logout">Logout</button>
+                </div>
             </div>
         </div>
     </div>
@@ -50,17 +41,15 @@
     {
         var authState = await AuthProvider.GetAuthenticationStateAsync();
         _user = authState.User;
-        
-        // Try to get email claim (if your JWT includes email)
+
         var emailClaim = _user?.FindFirst(ClaimTypes.Email) ?? _user?.FindFirst("email");
         if (emailClaim != null && !string.IsNullOrEmpty(emailClaim.Value))
             _email = emailClaim.Value;
     }
-    
 
     private async Task Logout()
     {
-        await AuthState.SetTokenAsync(null); // Clear token
-        Nav.NavigateTo("/", true); // Force reload to home
+        await AuthState.ClearTokenAsync();
+        await JS.InvokeVoidAsync("window.location.assign", "/");
     }
 }

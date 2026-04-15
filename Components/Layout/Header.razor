@@ -17,7 +17,7 @@
             <nav class="auth-buttons">
                 <AuthorizeView>
                     <Authorized>
-                        <a href="/account"><span class="text-white me-3">Hello, @context.User.Identity?.Name!</span></a>
+                        <a href="/profile"><span class="text-white me-3">Hello, @context.User.Identity?.Name!</span></a>
                         <button @onclick="Logout" class="btn btn-warning btn-sm">Log out</button>
                     </Authorized>
                     <NotAuthorized>
