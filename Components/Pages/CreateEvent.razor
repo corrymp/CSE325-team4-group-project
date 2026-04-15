@@ -1,0 +1,189 @@
+@page "/event/create"
+@using System.Net.Http.Json
+@using System.Text
+@using System.Text.Json
+@using Plan2Gather.Services
+@inject NavigationManager Nav
+@inject ApiHttpClientFactory ApiFactory
+
+<PageTitle>Create Event</PageTitle>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="card-title mb-4">Create New Event</h2>
+                <hr />
+
+                @if (!string.IsNullOrEmpty(_error))
+                {
+                    <div class="alert alert-danger">@_error</div>
+                }
+
+                <form @onsubmit="HandleSubmit" @onsubmit:preventDefault="true">
+                    <div class="mb-3">
+                        <label class="form-label">Event Name</label>
+                        <input type="text" class="form-control" @bind="_eventName" @bind:event="oninput" required maxlength="48" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description (optional)</label>
+                        <textarea class="form-control" @bind="_eventDescription" @bind:event="oninput" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" @bind="_allowGuestAccounts" />
+                        <label class="form-check-label">Allow Guest Accounts</label>
+                    </div>
+
+                    <h5>Time Slots</h5>
+                    <div id="timeSlots">
+                        @for (int i = 0; i < _timeSlots.Count; i++)
+                        {
+                            var slot = _timeSlots[i];
+                            var index = i;
+                            <div class="row mb-2 align-items-end">
+                                <div class="col-md-3">
+                                    <label class="form-label">Day</label>
+                                    <select class="form-select" @bind="slot.DayOfWeek">
+                                        @foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+                                        {
+                                            <option value="@day">@day</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Start Time</label>
+                                    <input type="time" class="form-control" value="@slot.StartTimeString" 
+                                           @onchange="@((ChangeEventArgs e) => { slot.StartTimeString = e.Value?.ToString() ?? "09:00"; })" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">End Time</label>
+                                    <input type="time" class="form-control" value="@slot.EndTimeString" 
+                                           @onchange="@((ChangeEventArgs e) => { slot.EndTimeString = e.Value?.ToString() ?? "17:00"; })" />
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="button" class="btn btn-danger" @onclick="() => RemoveTimeSlot(index)">Remove</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <button type="button" class="btn btn-secondary mb-3" @onclick="AddTimeSlot">+ Add Time Slot</button>
+
+                    <button type="submit" class="btn btn-primary w-100" disabled="@_loading">
+                        @(_loading ? "Creating..." : "Create Event")
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string _eventName = "";
+    private string _eventDescription = "";
+    private bool _allowGuestAccounts = false;
+    private List<TimeSlotUi> _timeSlots = new();
+    private string _error = "";
+    private bool _loading = false;
+
+    private class TimeSlotUi
+    {
+        public DayOfWeek DayOfWeek { get; set; } = DayOfWeek.Monday;
+        public string StartTimeString { get; set; } = "09:00";
+        public string EndTimeString { get; set; } = "17:00";
+        
+        public TimeOnly StartTime => TimeOnly.Parse(StartTimeString);
+        public TimeOnly EndTime => TimeOnly.Parse(EndTimeString);
+    }
+
+    private void AddTimeSlot()
+    {
+        _timeSlots.Add(new TimeSlotUi());
+        StateHasChanged();
+    }
+
+    private void RemoveTimeSlot(int index)
+    {
+        _timeSlots.RemoveAt(index);
+        StateHasChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        if (_timeSlots.Count == 0)
+        {
+            _timeSlots.Add(new TimeSlotUi());
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (_loading) return;
+        _error = "";
+        _loading = true;
+
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_eventName))
+            {
+                _error = "Event name is required.";
+                return;
+            }
+
+            if (_timeSlots.Count == 0)
+            {
+                _error = "At least one time slot is required.";
+                return;
+            }
+
+            foreach (var slot in _timeSlots)
+            {
+                if (slot.StartTime >= slot.EndTime)
+                {
+                    _error = $"For {slot.DayOfWeek}, start time must be before end time.";
+                    return;
+                }
+            }
+
+            var payload = new
+            {
+                Name = _eventName,
+                Description = _eventDescription,
+                AllowGuestAccounts = _allowGuestAccounts,
+                TimeSlots = _timeSlots.Select(s => new
+                {
+                    s.DayOfWeek,
+                    StartTime = s.StartTime.ToString("HH:mm"),
+                    EndTime = s.EndTime.ToString("HH:mm")
+                })
+            };
+
+            var client = ApiFactory.Create();
+            // Explicitly set content type to JSON
+            var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+            var response = await client.PostAsync("/api/events/", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+                int eventId = doc.RootElement.GetProperty("eventId").GetInt32();
+                Nav.NavigateTo($"/event/{eventId}");
+            }
+            else
+            {
+                var errorText = await response.Content.ReadAsStringAsync();
+                _error = $"Error: {errorText}";
+            }
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}

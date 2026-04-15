@@ -11,8 +11,8 @@ using Plan2Gather.Data;
 namespace Plan2Gather.Migrations
 {
     [DbContext(typeof(Plan2GatherContext))]
-    [Migration("20260409052956_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260415003436_AddEventSchedulingTables")]
+    partial class AddEventSchedulingTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -70,6 +70,60 @@ namespace Plan2Gather.Migrations
                     b.ToTable("Events");
                 });
 
+            modelBuilder.Entity("Plan2Gather.Models.EventAttendance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TimeSlotId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("TimeSlotId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EventAttendances");
+                });
+
+            modelBuilder.Entity("Plan2Gather.Models.EventTimeSlot", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("EventTimeSlots");
+                });
+
             modelBuilder.Entity("Plan2Gather.Models.Guest", b =>
                 {
                     b.Property<string>("GuestName")
@@ -114,6 +168,44 @@ namespace Plan2Gather.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Plan2Gather.Models.EventAttendance", b =>
+                {
+                    b.HasOne("Plan2Gather.Models.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Plan2Gather.Models.EventTimeSlot", "TimeSlot")
+                        .WithMany()
+                        .HasForeignKey("TimeSlotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Plan2Gather.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("TimeSlot");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Plan2Gather.Models.EventTimeSlot", b =>
+                {
+                    b.HasOne("Plan2Gather.Models.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
                 });
 #pragma warning restore 612, 618
         }

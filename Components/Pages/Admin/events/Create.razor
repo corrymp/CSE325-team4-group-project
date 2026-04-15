@@ -1,4 +1,4 @@
-@page "/events/create"
+@page "/events/(create)" 
 @using Microsoft.EntityFrameworkCore
 @using Plan2Gather.Models
 @inject IDbContextFactory<Plan2Gather.Data.Plan2GatherContext> DbFactory
@@ -38,9 +38,9 @@
                 <ValidationMessage For="() => evnt.StartTime" class="text-danger" />
             </div>
             <div class="mb-3">
-                <label for="duration" class="form-label">Duration (in hours from start time):</label>
-                <InputNumber id="duration" @bind-Value="evnt.Duration" class="form-control" />
-                <ValidationMessage For="() => evnt.Duration" class="text-danger" />
+                <label for="dates" class="form-label">Dates included:</label>
+                <InputText id="dates" @bind-Value="evnt.Dates" class="form-control" />
+                <ValidationMessage For="() => evnt.Dates" class="text-danger" />
             </div>
             <div class="mb-3">
                 <label for="guests" class="form-label">Allow guest accounts:</label>

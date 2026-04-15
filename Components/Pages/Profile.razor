@@ -1,0 +1,55 @@
+@page "/profile"
+@attribute [Authorize]
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using Plan2Gather.Auth
+@inject JwtAuthStateProvider AuthState
+@inject IJSRuntime JS
+@inject AuthenticationStateProvider AuthProvider
+
+<PageTitle>My Profile</PageTitle>
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-4">My Profile</h2>
+                <hr />
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Username:</label>
+                    <p class="form-control-plaintext">@_user?.Identity?.Name</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Email:</label>
+                    <p class="form-control-plaintext">@_email</p>
+                </div>
+                <div class="d-grid gap-2 mt-3">
+                    <a href="/event/create" class="btn btn-primary">Create New Event</a>
+                    <button class="btn btn-danger" @onclick="Logout">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private ClaimsPrincipal? _user;
+    private string _email = "Not provided";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        _user = authState.User;
+
+        var emailClaim = _user?.FindFirst(ClaimTypes.Email) ?? _user?.FindFirst("email");
+        if (emailClaim != null && !string.IsNullOrEmpty(emailClaim.Value))
+            _email = emailClaim.Value;
+    }
+
+    private async Task Logout()
+    {
+        await AuthState.ClearTokenAsync();
+        await JS.InvokeVoidAsync("window.location.assign", "/");
+    }
+}

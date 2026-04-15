@@ -1,0 +1,64 @@
+@using Plan2Gather.Services
+@using Plan2Gather.Models
+@inject NotificationService NotificationService
+@implements IDisposable
+
+<div class="notifications">
+    <button class="btn btn-secondary notif-button" @onclick="Toggle">
+        <span class="bell">🔔</span>
+        @if (NotificationService.UnreadCount > 0)
+        {
+            <span class="badge bg-danger">@NotificationService.UnreadCount</span>
+        }
+    </button>
+
+    @if (showList)
+    {
+        <div class="notif-list card p-2">
+            @if (NotificationService.Notifications.Count == 0)
+            {
+                <div class="p-2">No notifications</div>
+            }
+            else
+            {
+                <ul class="list-unstyled mb-0">
+                    @foreach (var n in NotificationService.Notifications)
+                    {
+                        <li class="notif-item border-bottom py-2">
+                            <div>@n.Message</div>
+                            <div class="text-muted small">@n.CreatedAt.ToLocalTime().ToString("g")</div>
+                            @if (!n.IsRead)
+                            {
+                                <button class="btn btn-link btn-sm" @onclick="() => MarkRead(n.Id)">Mark read</button>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private bool showList;
+
+    protected override void OnInitialized()
+    {
+        NotificationService.OnChange += StateHasChanged;
+    }
+
+    private void Toggle()
+    {
+        showList = !showList;
+    }
+
+    private void MarkRead(Guid id)
+    {
+        NotificationService.MarkRead(id);
+    }
+
+    public void Dispose()
+    {
+        NotificationService.OnChange -= StateHasChanged;
+    }
+}
