@@ -2,6 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Plan2Gather.Models;
 namespace Plan2Gather.Data;
 
+/**
+ * Example data used for showcasing the site.
+ * Each table is only populated if empty.
+ * IDs start at 42 because it's the answer to life, the universe, and everything.
+ */
 public static class SeedData
 {
     public static void Initialize(IServiceProvider serviceProvider)

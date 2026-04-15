@@ -13,8 +13,8 @@
             <div class="site-title">
                 <a href="/" class="text-white text-decoration-none fs-3 fw-bold">Plan2<span>Gather</span></a>
             </div>
-            <Notifications />
             <nav class="auth-buttons">
+                <Notifications />
                 <AuthorizeView>
                     <Authorized>
                         <a href="/profile"><span class="text-white me-3">Hello, @context.User.Identity?.Name!</span></a>
