@@ -11,8 +11,8 @@ using Plan2Gather.Data;
 namespace Plan2Gather.Migrations
 {
     [DbContext(typeof(Plan2GatherContext))]
-    [Migration("20260415003436_AddEventSchedulingTables")]
-    partial class AddEventSchedulingTables
+    [Migration("20260415205503_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,8 +46,9 @@ namespace Plan2Gather.Migrations
                     b.Property<bool>("AllowGuests")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Duration")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Dates")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("EventDescription")
                         .IsRequired()
