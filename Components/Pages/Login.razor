@@ -21,15 +21,15 @@
                     <div class="alert alert-danger" role="alert">@_error</div>
                 }
 
-                <EditForm FormName="login-form" Model="this" OnSubmit="HandleLogin">
+                <form @onsubmit="HandleLogin" @onsubmit:preventDefault="true">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
-                        <input type="text" id="username" class="form-control" placeholder="Username" @bind="_username" required />
+                        <input type="text" id="username" class="form-control" placeholder="Username" @bind="_username" @bind:event="oninput" required />
                     </div>
 
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" id="password" class="form-control" placeholder="Password" @bind="_password" required />
+                        <input type="password" id="password" class="form-control" placeholder="Password" @bind="_password" @bind:event="oninput" required />
                     </div>
 
                     <button type="submit" class="btn btn-orange w-100" disabled="@_loading">
@@ -39,7 +39,7 @@
                     <div class="text-center mt-3">
                         <p>Don't have an account? <a href="/register">Register</a></p>
                     </div>
-                </EditForm>
+                </form>
             </div>
         </div>
     </div>
@@ -53,13 +53,17 @@
 
     private async Task HandleLogin()
     {
+        Console.WriteLine("HandleLogin called");
         _error = "";
         _loading = true;
+
         try
         {
             var client = ApiFactory.Create();
             var payload = new LoginRequest(_username, _password);
             var response = await client.PostAsJsonAsync("/api/auth/login", payload);
+
+            Console.WriteLine($"Response status: {response.StatusCode}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -67,16 +71,24 @@
                 if (result is not null)
                 {
                     await AuthState.SetTokenAsync(result.Token);
-                    Nav.NavigateTo("/");
+                    Console.WriteLine("Token stored, navigating to profile");
+                    Nav.NavigateTo("/profile", true); // true forces a full page reload
+                }
+                else
+                {
+                    _error = "Invalid response from server.";
                 }
             }
             else
             {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Login error: {errorContent}");
                 _error = "Invalid username or password.";
             }
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"Exception: {ex.Message}");
             _error = $"Something went wrong: {ex.Message}";
         }
         finally

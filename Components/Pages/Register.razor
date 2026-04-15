@@ -21,45 +21,42 @@
                     <div class="alert alert-danger" role="alert">@_error</div>
                 }
 
-                <EditForm FormName="register-form" Model="this" OnSubmit="HandleRegister">
+                <form id="registerForm" @onsubmit="HandleRegister">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
-                        <input type="text" id="username" class="form-control" placeholder="Username" @bind="_username" maxlength="16" required />
+                        <input type="text" id="username" class="form-control" @bind="_username" @bind:event="oninput" required />
                     </div>
 
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" id="password" class="form-control" placeholder="Password" @bind="_password" required />
+                        <input type="password" id="password" class="form-control" @bind="_password" @bind:event="oninput" required />
                     </div>
 
                     <div class="mb-3">
                         <label for="confirmPassword" class="form-label">Confirm Password</label>
-                        <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm password" @bind="_confirmPassword" required />
+                        <input type="password" id="confirmPassword" class="form-control" @bind="_confirmPassword" @bind:event="oninput" required />
                     </div>
 
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email (optional — required for FULL account)</label>
-                        <input type="email" id="email" class="form-control" placeholder="Email" @bind="_email" />
+                        <label for="email" class="form-label">Email (optional)</label>
+                        <input type="email" id="email" class="form-control" @bind="_email" @bind:event="oninput" />
                     </div>
 
                     <div class="mb-3">
                         <label for="accType" class="form-label">Account Type</label>
                         <select id="accType" class="form-select" @bind="_accountType" @bind:event="onchange" required>
-                            <option value="" disabled>Select...</option>
+                            <option value="" disabled selected>Select...</option>
                             <option value="FULL">Organizer</option>
                             <option value="BASIC">User</option>
                         </select>
                     </div>
-
-                    <!-- Debug: show current selected value -->
-                    <div class="mb-3 text-muted small">Selected account type: "@_accountType"</div>
 
                     <button type="submit" class="btn btn-orange w-100">Register</button>
 
                     <div class="text-center mt-3">
                         <p>Already have an account? <a href="/login">Log in</a></p>
                     </div>
-                </EditForm>
+                </form>
             </div>
         </div>
     </div>
@@ -77,15 +74,23 @@
     {
         _error = "";
 
-        // Force a fresh read (though binding should be fine with onchange)
-        var selectedType = _accountType;
-
+        // Validation
+        if (string.IsNullOrWhiteSpace(_username))
+        {
+            _error = "Username is required.";
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(_password))
+        {
+            _error = "Password is required.";
+            return;
+        }
         if (_password != _confirmPassword)
         {
             _error = "Passwords do not match.";
             return;
         }
-        if (string.IsNullOrWhiteSpace(selectedType))
+        if (string.IsNullOrWhiteSpace(_accountType))
         {
             _error = "Please select an account type.";
             return;
@@ -94,7 +99,8 @@
         try
         {
             var client = ApiFactory.Create();
-            var payload = new RegisterRequest(_username, _password, _confirmPassword, selectedType, string.IsNullOrWhiteSpace(_email) ? null : _email);
+            var payload = new RegisterRequest(_username, _password, _confirmPassword, _accountType,
+                                              string.IsNullOrWhiteSpace(_email) ? null : _email);
             var response = await client.PostAsJsonAsync("/api/auth/register", payload);
 
             if (response.IsSuccessStatusCode)

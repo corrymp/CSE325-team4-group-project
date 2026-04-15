@@ -13,4 +13,6 @@ public class Plan2GatherContext(DbContextOptions<Plan2GatherContext> options) : 
     public DbSet<Event> Events { get; set; } = default!;
     public DbSet<Guest> Guests { get; set; } = default!;
     public DbSet<Availability> Availabilities { get; set; } = default!;
+public DbSet<EventTimeSlot> EventTimeSlots { get; set; } = default!;
+public DbSet<EventAttendance> EventAttendances { get; set; } = default!;
 }

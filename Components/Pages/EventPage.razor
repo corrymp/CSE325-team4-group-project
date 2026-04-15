@@ -1,0 +1,142 @@
+@page "/event/{EventId:int}"
+@rendermode InteractiveServer
+@using System.Net.Http.Json
+@using System.Security.Claims
+@using Plan2Gather.Auth             
+@using Plan2Gather.Services
+@inject NavigationManager Nav
+@inject ApiHttpClientFactory ApiFactory
+@inject JwtAuthStateProvider AuthState
+@inject IJSRuntime JS
+
+<PageTitle>@_eventName</PageTitle>
+
+@if (_loading)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="container">
+        <h2>@_eventName</h2>
+        @if (_isOrganizer)
+        {
+            <div class="alert alert-info">Organizer Controls</div>
+            <div class="mb-3">
+                <button class="btn btn-sm btn-secondary" @onclick="CopyInviteLink">Copy Invite Link</button>
+                <button class="btn btn-sm btn-secondary" @onclick="ExportToSpreadsheet">Export to Spreadsheet</button>
+                <button class="btn btn-sm btn-secondary" @onclick="AddDummyUser">Add Dummy User</button>
+            </div>
+        }
+
+        <h4>Availability Matrix</h4>
+        <div style="overflow-x: auto;">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        @foreach (var slot in _timeSlots)
+                        {
+                            <th>@slot.DayOfWeek<br />@slot.StartTime - @slot.EndTime</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in _attendancesByUser)
+                    {
+                        <tr>
+                            <td>@user.UserName</td>
+                            @foreach (var slot in _timeSlots)
+                            {
+                                var isAvail = user.AvailableSlotIds.Contains(slot.Id);
+                                <td style="background-color: @(isAvail ? "#90EE90" : "#FFCCCC"); cursor: pointer;"
+                                    @onclick="() => ToggleAvailability(user.UserId, slot.Id)">
+                                    @(isAvail ? "✓" : "✗")
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int EventId { get; set; }
+
+    private string _eventName = "";
+    private bool _isOrganizer = false;
+    private List<TimeSlotDto> _timeSlots = new();
+    private List<UserAttendanceDto> _attendancesByUser = new();
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEventData();
+        _loading = false;
+    }
+
+    private async Task LoadEventData()
+    {
+        var client = ApiFactory.Create();
+        var eventResp = await client.GetFromJsonAsync<EventDto>($"/api/events/{EventId}");
+        if (eventResp != null)
+        {
+            _eventName = eventResp.Name;
+            _isOrganizer = eventResp.IsOrganizer;
+            _timeSlots = eventResp.TimeSlots;
+        }
+
+        var attendancesResp = await client.GetFromJsonAsync<List<UserAttendanceDto>>($"/api/events/{EventId}/attendances");
+        if (attendancesResp != null)
+            _attendancesByUser = attendancesResp;
+    }
+
+    private async Task ToggleAvailability(int userId, int slotId)
+    {
+        var currentUserId = await GetCurrentUserId();
+        if (userId != currentUserId) return;
+
+        var userEntry = _attendancesByUser.FirstOrDefault(u => u.UserId == userId);
+        if (userEntry == null) return;
+
+        if (userEntry.AvailableSlotIds.Contains(slotId))
+            userEntry.AvailableSlotIds.Remove(slotId);
+        else
+            userEntry.AvailableSlotIds.Add(slotId);
+
+        var client = ApiFactory.Create();
+        await client.PostAsJsonAsync($"/api/events/{EventId}/attendance", new { AvailableSlotIds = userEntry.AvailableSlotIds });
+        StateHasChanged();
+    }
+
+    private async Task<int> GetCurrentUserId()
+    {
+        var authState = await AuthState.GetAuthenticationStateAsync();
+        var userIdClaim = authState.User.FindFirst(ClaimTypes.NameIdentifier);
+        return userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
+    }
+
+    private async Task CopyInviteLink()
+    {
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", Nav.BaseUri + $"event/{EventId}");
+    }
+
+    private async Task ExportToSpreadsheet()
+    {
+        var client = ApiFactory.Create();
+        await client.GetAsync($"/api/events/{EventId}/export");
+    }
+
+    private async Task AddDummyUser()
+    {
+        var client = ApiFactory.Create();
+        await client.PostAsync($"/api/events/{EventId}/dummy-user", null);
+        await LoadEventData();
+    }
+
+    private record EventDto(string Name, bool IsOrganizer, List<TimeSlotDto> TimeSlots);
+    private record TimeSlotDto(int Id, DayOfWeek DayOfWeek, string StartTime, string EndTime);
+    private record UserAttendanceDto(int UserId, string UserName, List<int> AvailableSlotIds);
+}
