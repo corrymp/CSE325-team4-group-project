@@ -1,0 +1,345 @@
+/* Full-width blue header */
+.blue-header {
+    background-color: #1b6ec2;
+    width: 100%;
+    margin: 0;
+    padding: 0.5rem 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+header {
+    margin: 0; /* REMOVE the gap */
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #001F52;
+}
+
+/* Yellow rectangle buttons (Register/Login) */
+.auth-buttons .btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+    font-weight: 500;
+    padding: 0.25rem 1rem;
+    border-radius: 0.2rem;
+}
+
+.auth-buttons .btn-warning:hover {
+    background-color: #e0a800;
+    border-color: #d39e00;
+}
+
+/* Orange button on home page */
+.btn-orange {
+    background-color: #fd7e14;
+    border-color: #fd7e14;
+    color: white;
+    font-weight: bold;
+    padding: 0.75rem 2rem;
+    border-radius: 0.3rem;
+}
+
+.btn-orange:hover {
+    background-color: #e96b0b;
+    border-color: #dc650a;
+    color: white;
+}
+
+
+/* HERO SECTION */
+section:first-of-type {
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 20px;
+}
+
+hgroup h1 {
+    font-size: 3rem;
+    margin: 0;
+    color: #001F52;
+}
+
+hgroup p {
+    font-size: 3rem;
+    margin: 0;
+    font-weight: bold;
+}
+
+hgroup span {
+    color: #FFC800;
+}
+
+/* HERO TEXT */
+section:first-of-type > p {
+    margin-top: 20px;
+    max-width: 600px;
+    color: #444;
+}
+
+/* BUTTON */
+section:first-of-type a {
+    display: inline-block;
+    margin-top: 20px;
+    background-color: #FFC800;
+    color: #001F52;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+section:first-of-type a:hover {
+    background-color: #e6b800;
+}
+
+/* DIVIDER */
+hr {
+    margin: 40px auto;
+    max-width: 900px;
+    border: none;
+    border-top: 1px solid #ddd;
+}
+
+/* HOW IT WORKS */
+section:nth-of-type(2) {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+section:nth-of-type(2) ol {
+    padding-left: 20px;
+}
+
+section:nth-of-type(2) li {
+    margin-bottom: 20px;
+}
+
+/* FEATURES SECTION */
+section:nth-of-type(3) {
+    max-width: 1100px;
+    margin: 60px auto;
+    padding: 20px;
+}
+
+/* GRID MAGIC HERE */
+section:nth-of-type(3) ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 30px;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+/* FEATURE CARD */
+section:nth-of-type(3) li {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    transition: 0.2s ease;
+}
+
+section:nth-of-type(3) li:hover {
+    transform: translateY(-4px);
+}
+
+section:nth-of-type(3) h3 {
+    color: #001F52;
+    margin-bottom: 10px;
+}
+
+section:nth-of-type(3) p {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+/* CTA */
+div:last-of-type {
+    text-align: center;
+    margin: 60px 0;
+}
+
+div:last-of-type a {
+    background-color: #FFC800;
+    color: #001F52;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+div:last-of-type a:hover {
+    background-color: #e6b800;
+}
+
+/* Hide default navbar if any (in case layout had one) */
+.navbar {
+    display: none;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body.dark-mode .blue-header {
+    background-color: #0a2b4e;
+}
+
+body.dark-mode .btn-orange {
+    background-color: #e06c00;
+    border-color: #e06c00;
+}
+
+body.dark-mode .btn-warning {
+    background-color: #f0b400;
+    border-color: #d39e00;
+    color: #000;
+}
+
+body.dark-mode .card,
+body.dark-mode .table,
+body.dark-mode .border {
+    background-color: #1e1e1e;
+    border-color: #333;
+}
+
+body.dark-mode a:not(.btn) {
+    color: #8bb9fe;
+}
+
+body.dark-mode .footer {
+    background-color: #1e1e1e;
+    border-top-color: #333;
+}
+
+.logo-text {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.site-footer {
+    background-color: #001F52;
+    padding: 10px;
+}
+
+.site-footer span {
+    color: #fff;
+}
+
+a, a:visited, a:hover, a:active {
+    text-decoration: none;
+}
+
+a:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.btn-primary {
+    background-color: #FFC800;
+    color: #001F52;
+    border: none;
+    font-weight: bold;
+    border-radius: 6px;
+}
+
+.btn-primary:hover {
+    background-color: #e6b800;
+}
+
+/* Log form styles */
+
+.auth-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+
+.auth-section form {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 350px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.auth-section h2 {
+    margin-bottom: 10px;
+    color: #001F52;
+}
+
+.auth-section hr {
+    margin-bottom: 20px;
+}
+
+/* FIX INPUT LAYOUT */
+.auth-section fieldset {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    border: none;
+    padding: 0;
+}
+
+/* LABEL ABOVE INPUT */
+.auth-section label {
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+/* INPUT STYLE */
+.auth-section input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+/* BUTTON */
+.auth-section button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background-color: #FFC800;
+    color: #001F52;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.auth-section button:hover {
+    background-color: #e6b800;
+}
+
+.auth-section p {
+    text-align: center;
+    margin-top: 15px;
+}
+.auth-section fieldset {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    border: none;
+    padding: 0;
+}
+
+/* KEY PART: reorder elements */
+.auth-section fieldset input, .auth-section fieldset select {
+    order: 2;
+}
+
+.auth-section fieldset label {
+    order: 1;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: #333;
+}
