@@ -1,11 +1,12 @@
 @page "/login"
-@rendermode InteractiveServer
+
 @using System.Net.Http.Json
 @using Plan2Gather.Auth
 @using Plan2Gather.Services
 @inject NavigationManager Nav
 @inject JwtAuthStateProvider AuthState
 @inject ApiHttpClientFactory ApiFactory
+@inject IJSRuntime JS
 
 <PageTitle>Login</PageTitle>
 
@@ -72,7 +73,7 @@
                 {
                     await AuthState.SetTokenAsync(result.Token);
                     Console.WriteLine("Token stored, navigating to profile");
-                    Nav.NavigateTo("/profile", true); // true forces a full page reload
+                    Nav.NavigateTo("/profile");
                 }
                 else
                 {

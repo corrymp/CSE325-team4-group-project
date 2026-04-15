@@ -1,20 +1,63 @@
-@* @using Microsoft.AspNetCore.Identity *@
-@* @inject SignInManager<IdentityUser> SignInManager *@
-@* @inject UserManager<IdentityUser> UserManager *@
+@* @using Microsoft.AspNetCore.Components.Authorization
+@using Plan2Gather.Auth
+@inject JwtAuthStateProvider AuthState
+@inject NavigationManager Nav
+@rendermode InteractiveServer
+
 <header class="header">
     <a href="/" class="logo"><span class="logo-text">Plan2<span>Gather</span></span></a>
     <nav class="header-nav">
-        @if (IsSignedIn){
-            <a href="/account">Hello, @Name</a>
-            <a href="/logout">Log out</a>
-        }else{
-            <a href="/login" class="btn btn-primary">Log in</a>
-            <a href="/register" class="btn btn-primary">Create Account</a>
-        }
+        <AuthorizeView>
+            <Authorized>
+                <a href="/account">Hello, @context.User.Identity?.Name</a>
+                <button class="btn btn-primary" @onclick="Logout">Log out</button>
+            </Authorized>
+            <NotAuthorized>
+                <a href="/login" class="btn btn-primary">Log in</a>
+                <a href="/register" class="btn btn-primary">Create Account</a>
+            </NotAuthorized>
+        </AuthorizeView>
     </nav>
 </header>
 
 @code {
-    private Boolean IsSignedIn = false;
-    private string Name = "User";
+    private async Task Logout()
+    {
+        await AuthState.ClearTokenAsync();
+        Nav.NavigateTo("/");
+    }
+} *@
+@using Microsoft.AspNetCore.Components.Authorization
+@using Plan2Gather.Auth
+@inject JwtAuthStateProvider AuthState
+@inject IJSRuntime JS
+
+<div class="blue-header">
+    <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center py-2">
+            <div class="site-title">
+                <a href="/" class="text-white text-decoration-none fs-3 fw-bold">Plan2Gather</a>
+            </div>
+            <div class="auth-buttons">
+                <AuthorizeView>
+                    <Authorized>
+                        <span class="text-white me-3">Hello, @context.User.Identity?.Name!</span>
+                        <button @onclick="Logout" class="btn btn-warning btn-sm">Logout</button>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a href="/register" class="btn btn-warning btn-sm me-2">Register</a>
+                        <a href="/login" class="btn btn-warning btn-sm">Login</a>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private async Task Logout()
+    {
+        await AuthState.ClearTokenAsync();
+        await JS.InvokeVoidAsync("window.location.assign", "/");
+    }
 }
