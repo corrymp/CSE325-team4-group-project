@@ -63,21 +63,27 @@ builder.Services.AddSingleton<NotificationService>();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope()) SeedData.Initialize(scope.ServiceProvider);
+// 🔧 Apply migrations automatically (creates database if missing)
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<Plan2GatherContext>();
+    dbContext.Database.Migrate();
+}
+
+// Seed data (now the database exists)
+using (var scope = app.Services.CreateScope()) 
+    SeedData.Initialize(scope.ServiceProvider);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) app.UseMigrationsEndPoint();
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
     app.UseMigrationsEndPoint();
 }
 
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-// Only enable HTTPS redirection when not in Development to avoid
-// the "Failed to determine the https port for redirect" warning during dev.
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
