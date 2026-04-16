@@ -1,14 +1,13 @@
-# Build stage
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# Build stage – use .NET 10 SDK
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 COPY . .
 RUN dotnet restore
 RUN dotnet publish -c Release -o /app/publish
 
-# Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# Runtime stage – use .NET 10 runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 COPY --from=build /app/publish .
-# Use Render's provided PORT environment variable
 ENV ASPNETCORE_URLS=http://0.0.0.0:${PORT:-10000}
 ENTRYPOINT ["dotnet", "Plan2Gather.dll"]
